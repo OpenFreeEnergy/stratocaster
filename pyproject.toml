@@ -1,0 +1,35 @@
+[project]
+name = "stratocaster"
+description = ""
+readme = {file = "README", content-type = "text/markdown"}
+authors = [{name = "OpenFE and OpenFF developers"}]
+license = {file = "LICENSE"}
+classifiers = [
+	    "Intended Audience :: Science/Research",
+	    "License :: OSI Approved :: MIT License",
+	    "Operating System :: POSIX",
+	    "Programming Language :: Python :: 3",
+]
+requires-python = ">= 3.9",
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/OpenFreeEnergy/stratocaster"
+
+[project.optional-dependencies]
+test = [
+     "pytest",
+]
+dev = [
+    "stratocaster[test]",
+    "black",
+]
+
+[build-system]
+requires = [
+    "setuptools",
+    "versioningit",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.versioningit]
