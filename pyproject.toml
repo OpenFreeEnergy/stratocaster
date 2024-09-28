@@ -1,7 +1,7 @@
 [project]
 name = "stratocaster"
 description = ""
-readme = {file = "README", content-type = "text/markdown"}
+readme = {file = "README.md", content-type = "text/markdown"}
 authors = [{name = "OpenFE and OpenFF developers"}]
 license = {file = "LICENSE"}
 classifiers = [
@@ -32,4 +32,13 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages]
+find = {namespaces = false}
+
 [tool.versioningit]
+default-version = "1+unknown"
+
+[tool.versioningit.vcs]
+method = "git"
+match = ["v*"]
+default-tag = "v0.0.0"
