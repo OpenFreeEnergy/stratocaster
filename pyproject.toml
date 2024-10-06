@@ -2,19 +2,24 @@
 name = "stratocaster"
 description = ""
 readme = {file = "README.md", content-type = "text/markdown"}
-authors = [{name = "OpenFE and OpenFF developers"}]
+maintainers = [
+            {name = "Ian Kenney", email = "ianmichaelkenney@gmail.com"}
+]
+authors = [{name = "Ian Kenney", email = "ianmichaelkenney@gmail.com"}]
 license = {file = "LICENSE"}
 classifiers = [
 	    "Intended Audience :: Science/Research",
 	    "License :: OSI Approved :: MIT License",
 	    "Operating System :: POSIX",
 	    "Programming Language :: Python :: 3",
+	    "Development Status :: 1 - Planning",
 ]
 requires-python = ">= 3.9"
 dynamic = ["version"]
 
 [project.urls]
 Homepage = "https://github.com/OpenFreeEnergy/stratocaster"
+Issues = "https://github.com/OpenFreeEnergy/stratocaster/issues"
 
 [project.optional-dependencies]
 test = [
