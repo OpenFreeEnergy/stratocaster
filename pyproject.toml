@@ -32,9 +32,6 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages]
-find = {namespaces = false}
-
 [tool.versioningit]
 default-version = "1+unknown"
 
