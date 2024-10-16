@@ -1,0 +1,16 @@
+stratocaster
+============
+
+The stratocaster package is complimentary to gufe and provides suggestions, via Strategies, for optimally executing Transformation Protocols defined in AlchemicalNetworks.
+
+This library includes a set of Strategy implementations as well as base classes to facilitate the creation of custom Strategy implementations.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   installation
+   getting_started
+   user_guide
+   developer_guide
+   api
