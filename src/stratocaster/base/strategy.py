@@ -1,9 +1,8 @@
 import abc
 from typing import Self
 
-from gufe.tokenization import GufeTokenizable
-from gufe import AlchemicalNetwork
-from gufe.protocols import ProtocolResult
+from gufe.tokenization import GufeTokenizable, GufeKey
+from gufe import AlchemicalNetwork, ProtocolResult
 
 from .models import StrategySettings
 
@@ -52,13 +51,13 @@ class Strategy(GufeTokenizable):
     def _propose(
         self,
         alchemical_network: AlchemicalNetwork,
-        protocol_results: list[ProtocolResult],
+        protocol_results: dict[GufeKey, ProtocolResult],
     ) -> StrategyResult:
         raise NotImplementedError
 
     def propose(
         self,
         alchemical_network: AlchemicalNetwork,
-        protocol_results: list[ProtocolResult],
+        protocol_results: dict[GufeKey, ProtocolResult],
     ) -> StrategyResult:
         return self._propose(alchemical_network, protocol_results)
