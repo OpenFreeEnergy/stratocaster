@@ -9,7 +9,7 @@ from .models import StrategySettings
 
 class StrategyResult(GufeTokenizable):
 
-    def __init__(self, weights):
+    def __init__(self, weights: dict[GufeKey, float | None]):
         self._weights = weights
 
     @classmethod
@@ -22,6 +22,21 @@ class StrategyResult(GufeTokenizable):
     @classmethod
     def _from_dict(cls, dct: dict) -> Self:
         return cls(**dct)
+
+    @property
+    def weights(self) -> dict[GufeKey, float | None]:
+        return self._weights
+
+    def resolve(self) -> dict[GufeKey, float | None]:
+        weights = self.weights
+        weight_sum = sum([weight for weight in weights.values() if weight is not None])
+        modified_weights = {
+            key: weight / weight_sum
+            for key, weight in weights.items()
+            if weight is not None
+        }
+        weights.update(modified_weights)
+        return weights
 
 
 # TODO: docstrings
