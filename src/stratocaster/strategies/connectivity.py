@@ -33,7 +33,7 @@ class ConnectivityStrategySettings(StrategySettings):
         if not (0 < value < 1):
             raise ValueError("`decay_rate` must be between 0 and 1")
         return value
-    
+
     @field_validator("max_runs")
     def validate_max_runs(cls, value):
         if value is not None:
@@ -49,7 +49,7 @@ class ConnectivityStrategySettings(StrategySettings):
             raise ValueError("At least one of `max_runs` or `cutoff` must be set")
 
         return values
-        
+
 
 class ConnectivityStrategy(Strategy):
 
@@ -80,7 +80,7 @@ class ConnectivityStrategy(Strategy):
         settings = self._settings
 
         alchemical_network_mdg = alchemical_network.graph
-        weights: dict[GufeKey, Optional[float]] = {}
+        weights: dict[GufeKey, float | None] = {}
 
         for state_a, state_b in alchemical_network_mdg.edges():
             num_neighbors_a = alchemical_network_mdg.degree(state_a)
@@ -95,12 +95,12 @@ class ConnectivityStrategy(Strategy):
 
             match (protocol_results.get(transformation_key)):
                 case None:
-                    transformation_num_components = 0
+                    transformation_n_protcol_dag_results = 0
                 case pr:
-                    transformation_num_components = pr.num_components
+                    transformation_n_protcol_dag_results = pr.n_protocol_dag_results
 
             scaling_factor = self._exponential_decay_scaling(
-                transformation_num_components, settings["decay_rate"]
+                transformation_n_protcol_dag_results, settings["decay_rate"]
             )
             weight = scaling_factor * (num_neighbors_a + num_neighbors_b) / 2
 
@@ -109,10 +109,13 @@ class ConnectivityStrategy(Strategy):
                     if weight < cutoff:
                         weight = None
                 case (max_runs, None):
-                    if transformation_num_components >= max_runs:
+                    if transformation_n_protcol_dag_results >= max_runs:
                         weight = None
                 case (max_runs, cutoff):
-                    if weight < cutoff or transformation_num_components >= max_runs:
+                    if (
+                        weight < cutoff
+                        or transformation_n_protcol_dag_results >= max_runs
+                    ):
                         weight = None
 
             weights[transformation_key] = weight
