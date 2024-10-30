@@ -1,25 +1,55 @@
-from typing import Optional
 from gufe import AlchemicalNetwork, ProtocolResult
 from gufe.tokenization import GufeKey
 
 from stratocaster.base import Strategy, StrategyResult
 from stratocaster.base.models import StrategySettings
 
-from pydantic import field_validator
+from pydantic import field_validator, Field, model_validator
 
 
 class ConnectivityStrategySettings(StrategySettings):
 
-    decay_rate: float = 0.5
-    cutoff: Optional[float] = None
-    max_runs: Optional[int] = None
+    decay_rate: float = Field(
+        0.5, description="decay rate of the exponential decay penalty factor"
+    )
+    cutoff: float | None = Field(
+        default=None,
+        description="unnormalized weight cutoff used for termination condition",
+    )
+    max_runs: int | None = Field(
+        default=None,
+        description="the upper limit of protocol DAG results needed before a transformation is no longer weighed",
+    )
 
-    @field_validator("cutoff", "decay_rate")
+    @field_validator("cutoff")
     def validate_cutoff(cls, value):
-        if not (0 < value < 1):
-            raise ValueError("value must be between 0 and 1")
+        if value is not None:
+            if not (0 < value < 1):
+                raise ValueError("`cutoff` must be between 0 and 1")
         return value
 
+    @field_validator("decay_rate")
+    def validate_decay_rate(cls, value):
+        if not (0 < value < 1):
+            raise ValueError("`decay_rate` must be between 0 and 1")
+        return value
+    
+    @field_validator("max_runs")
+    def validate_max_runs(cls, value):
+        if value is not None:
+            if not value >= 1:
+                raise ValueError("`max_runs` must be greater than or equal to 1")
+        return value
+
+    @model_validator(mode="before")
+    def check_cutoff_or_max_runs(cls, values):
+        max_runs, cutoff = values.get("max_runs"), values.get("cutoff")
+
+        if max_runs is None and cutoff is None:
+            raise ValueError("At least one of `max_runs` or `cutoff` must be set")
+
+        return values
+        
 
 class ConnectivityStrategy(Strategy):
 
