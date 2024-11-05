@@ -4,13 +4,13 @@ from gufe.tokenization import GufeKey
 from stratocaster.base import Strategy, StrategyResult
 from stratocaster.base.models import StrategySettings
 
-from pydantic import field_validator, Field, model_validator
+from pydantic import validator, Field, root_validator
 
 
 class ConnectivityStrategySettings(StrategySettings):
 
     decay_rate: float = Field(
-        0.5, description="decay rate of the exponential decay penalty factor"
+        default=0.5, description="decay rate of the exponential decay penalty factor"
     )
     cutoff: float | None = Field(
         default=None,
@@ -21,27 +21,27 @@ class ConnectivityStrategySettings(StrategySettings):
         description="the upper limit of protocol DAG results needed before a transformation is no longer weighed",
     )
 
-    @field_validator("cutoff")
+    @validator("cutoff")
     def validate_cutoff(cls, value):
         if value is not None:
             if not (0 < value < 1):
                 raise ValueError("`cutoff` must be between 0 and 1")
         return value
 
-    @field_validator("decay_rate")
+    @validator("decay_rate")
     def validate_decay_rate(cls, value):
         if not (0 < value < 1):
             raise ValueError("`decay_rate` must be between 0 and 1")
         return value
 
-    @field_validator("max_runs")
+    @validator("max_runs")
     def validate_max_runs(cls, value):
         if value is not None:
             if not value >= 1:
                 raise ValueError("`max_runs` must be greater than or equal to 1")
         return value
 
-    @model_validator(mode="before")
+    @root_validator
     def check_cutoff_or_max_runs(cls, values):
         max_runs, cutoff = values.get("max_runs"), values.get("cutoff")
 
@@ -52,6 +52,8 @@ class ConnectivityStrategySettings(StrategySettings):
 
 
 class ConnectivityStrategy(Strategy):
+
+    _settings_cls = ConnectivityStrategySettings
 
     def _exponential_decay_scaling(self, number_of_results: int, decay_rate: float):
         return decay_rate**number_of_results
@@ -74,10 +76,12 @@ class ConnectivityStrategy(Strategy):
         -------
         StrategyResult
             A `StrategyResult` containing the proposed `Transformation` weights.
-
         """
 
-        settings = self._settings
+        settings = self.settings
+
+        # keep the type checker happy
+        assert isinstance(settings, ConnectivityStrategySettings)
 
         alchemical_network_mdg = alchemical_network.graph
         weights: dict[GufeKey, float | None] = {}
@@ -97,21 +101,22 @@ class ConnectivityStrategy(Strategy):
                 case None:
                     transformation_n_protcol_dag_results = 0
                 case pr:
+                    assert isinstance(pr, ProtocolResult)
                     transformation_n_protcol_dag_results = pr.n_protocol_dag_results
 
             scaling_factor = self._exponential_decay_scaling(
-                transformation_n_protcol_dag_results, settings["decay_rate"]
+                transformation_n_protcol_dag_results, settings.decay_rate
             )
             weight = scaling_factor * (num_neighbors_a + num_neighbors_b) / 2
 
-            match (settings.get("max_runs", None), settings.get("cutoff")):
-                case (None, cutoff):
+            match (settings.max_runs, settings.cutoff):
+                case (None, cutoff) if cutoff is not None:
                     if weight < cutoff:
                         weight = None
-                case (max_runs, None):
+                case (max_runs, None) if max_runs is not None:
                     if transformation_n_protcol_dag_results >= max_runs:
                         weight = None
-                case (max_runs, cutoff):
+                case (max_runs, cutoff) if max_runs is not None and cutoff is not None:
                     if (
                         weight < cutoff
                         or transformation_n_protcol_dag_results >= max_runs
@@ -125,4 +130,4 @@ class ConnectivityStrategy(Strategy):
 
     @classmethod
     def _default_settings(cls) -> StrategySettings:
-        return StrategySettings()
+        return ConnectivityStrategySettings(max_runs=3)

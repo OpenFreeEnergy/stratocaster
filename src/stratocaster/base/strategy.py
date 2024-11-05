@@ -1,10 +1,12 @@
 import abc
-from typing import Self
+from typing import Self, TypeVar
 
 from gufe.tokenization import GufeTokenizable, GufeKey
 from gufe import AlchemicalNetwork, ProtocolResult
 
 from .models import StrategySettings
+
+_ProtocolResult = TypeVar("_ProtocolResult", bound=ProtocolResult)
 
 
 class StrategyResult(GufeTokenizable):
@@ -43,8 +45,20 @@ class StrategyResult(GufeTokenizable):
 class Strategy(GufeTokenizable):
     """An object that proposes the relative urgency of computing transformations within an AlchemicalNetwork."""
 
+    _settings_cls: type[StrategySettings]
+
     def __init__(self, settings: StrategySettings):
+
+        # TODO better error error message
+        if not isinstance(settings, self._settings_cls):
+            raise ValueError()
+
         self._settings = settings
+        super().__init__()
+
+    @property
+    def settings(self) -> StrategySettings:
+        return self._settings
 
     @classmethod
     def _defaults(cls):
@@ -66,13 +80,13 @@ class Strategy(GufeTokenizable):
     def _propose(
         self,
         alchemical_network: AlchemicalNetwork,
-        protocol_results: dict[GufeKey, ProtocolResult],
+        protocol_results: dict[GufeKey, _ProtocolResult],
     ) -> StrategyResult:
         raise NotImplementedError
 
     def propose(
         self,
         alchemical_network: AlchemicalNetwork,
-        protocol_results: dict[GufeKey, ProtocolResult],
+        protocol_results: dict[GufeKey, _ProtocolResult],
     ) -> StrategyResult:
         return self._propose(alchemical_network, protocol_results)
