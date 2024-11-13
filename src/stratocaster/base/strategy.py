@@ -9,6 +9,7 @@ from .models import StrategySettings
 _ProtocolResult = TypeVar("_ProtocolResult", bound=ProtocolResult)
 
 
+# TODO: docstrings
 class StrategyResult(GufeTokenizable):
 
     def __init__(self, weights: dict[GufeKey, float | None]):

@@ -7,6 +7,7 @@ from stratocaster.base.models import StrategySettings
 from pydantic import validator, Field, root_validator
 
 
+# TODO: docstrings
 class ConnectivityStrategySettings(StrategySettings):
 
     decay_rate: float = Field(
@@ -24,8 +25,8 @@ class ConnectivityStrategySettings(StrategySettings):
     @validator("cutoff")
     def validate_cutoff(cls, value):
         if value is not None:
-            if not (0 < value < 1):
-                raise ValueError("`cutoff` must be between 0 and 1")
+            if not (0 < value):
+                raise ValueError("`cutoff` must be greater than 0")
         return value
 
     @validator("decay_rate")
@@ -51,6 +52,7 @@ class ConnectivityStrategySettings(StrategySettings):
         return values
 
 
+# TODO: docstrings
 class ConnectivityStrategy(Strategy):
 
     _settings_cls = ConnectivityStrategySettings
