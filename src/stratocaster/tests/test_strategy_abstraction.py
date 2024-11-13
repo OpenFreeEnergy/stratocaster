@@ -42,11 +42,8 @@ class StrategyB(StrategyNoSettings):
     ((StrategyA, StrategyBSettings), (StrategyB, StrategyASettings)),
 )
 def test_incorrect_strategy_settings_passed(strategy, settings):
-    try:
+    with pytest.raises(ValueError):
         strategy(settings())
-        assert False
-    except ValueError as e:
-        pass
 
 
 @pytest.mark.parametrize(
@@ -58,3 +55,9 @@ def test_correct_strategy_settings_passed(strategy, settings):
     strat = strategy(strat_settings)
 
     assert strat._settings_cls == settings
+
+
+def test_no_settings_implemented():
+
+    with pytest.raises(NotImplementedError):
+        StrategyNoSettings(StrategyASettings())

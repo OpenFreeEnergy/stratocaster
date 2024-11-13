@@ -49,9 +49,15 @@ class Strategy(GufeTokenizable):
 
     def __init__(self, settings: StrategySettings):
 
-        # TODO better error error message
+        if not hasattr(self.__class__, "_settings_cls"):
+            raise NotImplementedError(
+                f"class `{self.__class__.__qualname__}` must implement the `_settings_cls` attribute."
+            )
+
         if not isinstance(settings, self._settings_cls):
-            raise ValueError()
+            raise ValueError(
+                f"`{self.__class__.__qualname__}` expected a `{self._settings_cls.__qualname__}` instance"
+            )
 
         self._settings = settings
         super().__init__()
