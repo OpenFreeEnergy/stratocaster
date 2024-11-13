@@ -97,7 +97,6 @@ def test_propose_cutoff(benzene_variants_star_map):
     num_runs = math.floor(
         math.log(settings.cutoff / 3.5) / math.log(settings.decay_rate)
     )
-    print(num_runs)
 
     result_data: dict[GufeKey, DummyProtocolResult] = {}
     for transformation in benzene_variants_star_map.edges:
