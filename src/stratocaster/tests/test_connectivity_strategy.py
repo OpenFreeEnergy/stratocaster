@@ -1,5 +1,5 @@
 import math
-from random import shuffle
+from random import shuffle, randint
 
 from gufe import AlchemicalNetwork
 import pytest
@@ -197,3 +197,35 @@ def test_simulated_termination(
         else:
             break
         current_iteration += 1
+
+
+def test_deterministic(
+    default_strategy: ConnectivityStrategy, benzene_variants_star_map: AlchemicalNetwork
+):
+
+    settings = default_strategy.settings
+    assert isinstance(settings, ConnectivityStrategySettings)
+
+    max_runs = settings.max_runs
+    assert isinstance(max_runs, int)
+
+    def random_runs():
+        """Generate random randomized inputs for propose."""
+        return {
+            transformation.key: DummyProtocolResult(
+                n_protocol_dag_results=randint(0, max_runs),
+                info=f"key: {transformation.key}",
+            )
+            for transformation in benzene_variants_star_map.edges
+        }
+
+    for _ in range(10):
+        random_protocol_results = random_runs()
+        proposal = default_strategy.propose(
+            benzene_variants_star_map, protocol_results=random_protocol_results
+        )
+        for _ in range(3):
+            _proposal = default_strategy.propose(
+                benzene_variants_star_map, protocol_results=random_protocol_results
+            )
+            assert _proposal == proposal
