@@ -1,4 +1,5 @@
 import math
+from random import shuffle
 
 from gufe import AlchemicalNetwork
 import pytest
@@ -27,6 +28,32 @@ from gufe.tests.conftest import (
     PDB_181L_path,
 )
 from gufe.tokenization import GufeKey
+
+SETTINGS_VALID = [(0.5, 0.1, 10), (0.1, None, 10), (0.5, 0.1, None)]
+
+
+@pytest.mark.parametrize(
+    ["decay_rate", "cutoff", "max_runs", "raises"],
+    [
+        (0, None, None, ValueError),
+        (1, None, None, ValueError),
+        (0.5, 0, None, ValueError),
+        (0.5, None, 0, ValueError),
+    ]
+    + [(*vals, None) for vals in SETTINGS_VALID],  # include all valid settings
+)
+def test_connectivity_strategy_settings(decay_rate, cutoff, max_runs, raises):
+
+    def instantiate_settings():
+        ConnectivityStrategySettings(
+            decay_rate=decay_rate, cutoff=cutoff, max_runs=max_runs
+        )
+
+    if raises:
+        with pytest.raises(raises):
+            instantiate_settings()
+    else:
+        instantiate_settings()
 
 
 @pytest.fixture
@@ -71,8 +98,9 @@ def test_propose_previous_results(
 def test_propose_max_runs_termination(
     default_strategy: ConnectivityStrategy, benzene_variants_star_map: AlchemicalNetwork
 ):
-
+    assert isinstance(default_strategy.settings, ConnectivityStrategySettings)
     max_runs = default_strategy.settings.max_runs
+    assert isinstance(max_runs, int)
 
     result_data: dict[GufeKey, DummyProtocolResult] = {}
     for transformation in benzene_variants_star_map.edges:
@@ -88,12 +116,17 @@ def test_propose_max_runs_termination(
     assert not [weight for weight in results.resolve().values() if weight is not None]
 
 
-def test_propose_cutoff(benzene_variants_star_map):
+def test_propose_cutoff_num_runs_predictioned_termination(benzene_variants_star_map):
+    """We can predict the number of runs needed to terminate with a given cutoff.
+
+    Each edge in benzene_variants_star_map has a base weight of 3.5.
+    """
 
     settings = ConnectivityStrategySettings(cutoff=2, decay_rate=0.5)
     strategy = ConnectivityStrategy(settings)
 
     assert isinstance(settings.cutoff, float)
+
     num_runs = math.floor(
         math.log(settings.cutoff / 3.5) / math.log(settings.decay_rate)
     )
@@ -109,3 +142,58 @@ def test_propose_cutoff(benzene_variants_star_map):
     results = strategy.propose(benzene_variants_star_map, result_data)
 
     assert not [weight for weight in results.weights.values() if weight is not None]
+
+
+@pytest.mark.parametrize(["decay_rate", "cutoff", "max_runs"], SETTINGS_VALID)
+def test_simulated_termination(
+    default_strategy, benzene_variants_star_map, decay_rate, cutoff, max_runs
+):
+
+    settings = ConnectivityStrategySettings(
+        decay_rate=decay_rate, cutoff=cutoff, max_runs=max_runs
+    )
+    default_strategy = ConnectivityStrategy(settings)
+
+    def counts_to_result_data(counts_dict):
+        result_data = {}
+        for transformation_key, count in counts_dict.items():
+            result = DummyProtocolResult(
+                n_protocol_dag_results=count, info=f"key: {transformation_key}"
+            )
+            result_data[transformation_key] = result
+        return result_data
+
+    def shuffle_take_n(keys_list, n):
+        shuffle(keys_list)
+        return keys_list[:n]
+
+    # initial transforms
+    transformation_counts = {
+        transformation.key: 0 for transformation in benzene_variants_star_map.edges
+    }
+
+    max_iterations = 100
+    current_iteration = 0
+    while current_iteration <= max_iterations:
+
+        if current_iteration == max_iterations:
+            raise RuntimeError(
+                f"Strategy did not terminate in {max_iterations} iterations "
+            )
+
+        result_data = counts_to_result_data(transformation_counts)
+        proposal = default_strategy.propose(benzene_variants_star_map, result_data)
+
+        # get random transformations from those with a non-None weight
+        resolved_keys = shuffle_take_n(
+            [key for key, weight in proposal.resolve().items() if weight is not None], 5
+        )
+
+        if resolved_keys:
+            # pretend we ran each of the randomly selected protocols
+            for key in resolved_keys:
+                transformation_counts[key] += 1
+        # if we got an empty list back, there are not more protocols to run
+        else:
+            break
+        current_iteration += 1

@@ -24,6 +24,7 @@ Issues = "https://github.com/OpenFreeEnergy/stratocaster/issues"
 [project.optional-dependencies]
 test = [
      "pytest",
+     "pytest-cov",
 ]
 dev = [
     "stratocaster[test]",
