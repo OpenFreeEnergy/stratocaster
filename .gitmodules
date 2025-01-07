@@ -1,0 +1,3 @@
+[submodule "lib/gufe"]
+	path = lib/gufe
+	url = git@github.com:OpenFreeEnergy/gufe

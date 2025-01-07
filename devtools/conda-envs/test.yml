@@ -5,9 +5,4 @@ channels:
 dependencies:
   - python>=3.9
 
-  - gufe>=1.0.0
-
-  - pytest
-  - pytest-xdist
-  - pytest-cov
-  - coverage
+  - gufe>=1.2.0

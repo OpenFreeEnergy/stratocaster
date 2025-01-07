@@ -15,6 +15,7 @@ from stratocaster.base.models import StrategySettings
 from gufe.tests.test_protocol import DummyProtocol, DummyProtocolResult
 from gufe.tests.conftest import (
     benzene_variants_star_map,
+    benzene_variants_star_map_transformations,
     benzene,
     benzene_modifications,
     toluene,
