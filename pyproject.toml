@@ -30,6 +30,10 @@ dev = [
     "stratocaster[test]",
     "black",
 ]
+docs = [
+     "sphinx",
+     "ofe-sphinx-theme @ git+https://github.com/OpenFreeEnergy/ofe-sphinx-theme.git@main",
+]
 
 [build-system]
 requires = [

@@ -3,9 +3,4 @@ channels:
   - conda-forge
 
 dependencies:
-  - python>=3.9
-  - gufe>=1.0.0
-  - sphinx
-
-  - pip:
-    - git+https://github.com/OpenFreeEnergy/ofe-sphinx-theme@a45f3edd5bc3e973c1a01b577c71efa1b62a65d6
+  - python>=3.12
