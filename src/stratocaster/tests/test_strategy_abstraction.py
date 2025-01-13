@@ -1,10 +1,9 @@
 import pytest
-
-from stratocaster.base import StrategySettings, Strategy
-from stratocaster.base.strategy import StrategyResult
-
 from gufe import AlchemicalNetwork, ProtocolResult
 from gufe.tokenization import GufeKey
+
+from stratocaster.base import Strategy, StrategySettings
+from stratocaster.base.strategy import StrategyResult
 
 
 class StrategyASettings(StrategySettings):

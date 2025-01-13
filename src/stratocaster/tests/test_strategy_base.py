@@ -1,6 +1,7 @@
-from stratocaster.base import Strategy, StrategySettings, StrategyResult
 from gufe import AlchemicalNetwork, ProtocolResult
 from gufe.tokenization import GufeKey
+
+from stratocaster.base import Strategy, StrategyResult, StrategySettings
 
 
 class TestStrategyResult:

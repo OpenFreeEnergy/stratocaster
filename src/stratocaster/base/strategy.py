@@ -1,8 +1,8 @@
 import abc
 from typing import Self, TypeVar
 
-from gufe.tokenization import GufeTokenizable, GufeKey
 from gufe import AlchemicalNetwork, ProtocolResult
+from gufe.tokenization import GufeKey, GufeTokenizable
 
 from .models import StrategySettings
 

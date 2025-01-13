@@ -29,6 +29,7 @@ test = [
 dev = [
     "stratocaster[test]",
     "black",
+    "isort",
 ]
 docs = [
      "sphinx",
@@ -41,6 +42,9 @@ requires = [
     "versioningit",
 ]
 build-backend = "setuptools.build_meta"
+
+[tool.isort]
+profile = "black"
 
 [tool.versioningit]
 default-version = "1+unknown"

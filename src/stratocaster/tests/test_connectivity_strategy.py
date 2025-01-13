@@ -1,16 +1,16 @@
 import math
-from random import shuffle, randint
+from random import randint, shuffle
 
-from gufe import AlchemicalNetwork
 import pytest
+from gufe import AlchemicalNetwork
 from gufe.tests.test_protocol import DummyProtocol, DummyProtocolResult
 
+from stratocaster.base.models import StrategySettings
+from stratocaster.base.strategy import StrategyResult
 from stratocaster.strategies.connectivity import (
     ConnectivityStrategy,
     ConnectivityStrategySettings,
 )
-from stratocaster.base.strategy import StrategyResult
-from stratocaster.base.models import StrategySettings
 from stratocaster.tests.networks import (
     benzene_variants_star_map as _benzene_variants_star_map,
 )
