@@ -3,6 +3,7 @@ from random import shuffle, randint
 
 from gufe import AlchemicalNetwork
 import pytest
+from gufe.tests.test_protocol import DummyProtocol, DummyProtocolResult
 
 from stratocaster.strategies.connectivity import (
     ConnectivityStrategy,
@@ -10,24 +11,16 @@ from stratocaster.strategies.connectivity import (
 )
 from stratocaster.base.strategy import StrategyResult
 from stratocaster.base.models import StrategySettings
-
-
-from gufe.tests.test_protocol import DummyProtocol, DummyProtocolResult
-from gufe.tests.conftest import (
-    benzene_variants_star_map,
-    benzene_variants_star_map_transformations,
-    benzene,
-    benzene_modifications,
-    toluene,
-    phenol,
-    benzonitrile,
-    anisole,
-    benzaldehyde,
-    styrene,
-    prot_comp,
-    solv_comp,
-    PDB_181L_path,
+from stratocaster.tests.networks import (
+    benzene_variants_star_map as _benzene_variants_star_map,
 )
+
+
+@pytest.fixture(scope="module")
+def benzene_variants_star_map():
+    return _benzene_variants_star_map()
+
+
 from gufe.tokenization import GufeKey
 
 SETTINGS_VALID = [(0.5, 0.1, 10), (0.1, None, 10), (0.5, 0.1, None)]
