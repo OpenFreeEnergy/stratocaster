@@ -1,9 +1,19 @@
 from gufe import AlchemicalNetwork, ProtocolResult
 from gufe.tokenization import GufeKey
-from pydantic import Field, root_validator, validator
 
 from stratocaster.base import Strategy, StrategyResult
 from stratocaster.base.models import StrategySettings
+
+try:
+    from pydantic.v1 import Field, root_validator, validator
+except ImportError:
+    from pydantic import (
+        Field,
+        root_validator,
+        validator,
+    )
+
+import pydantic
 
 
 # TODO: docstrings
