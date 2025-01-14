@@ -1,13 +1,12 @@
 import abc
-from typing import Self, TypeVar
+from typing import TypeVar
 
 from gufe import AlchemicalNetwork, ProtocolResult
 from gufe.tokenization import GufeKey, GufeTokenizable
 
 from .models import StrategySettings
 
-_ProtocolResult = TypeVar("_ProtocolResult", bound=ProtocolResult)
-
+TProtocolResult = TypeVar("TProtocolResult", bound=ProtocolResult)
 
 # TODO: docstrings
 class StrategyResult(GufeTokenizable):
@@ -22,8 +21,9 @@ class StrategyResult(GufeTokenizable):
     def _to_dict(self) -> dict:
         return {"weights": self._weights}
 
+    # TODO: Return type from typing.Self when Python 3.10 is no longer supported
     @classmethod
-    def _from_dict(cls, dct: dict) -> Self:
+    def _from_dict(cls, dct: dict):
         return cls(**dct)
 
     @property
@@ -74,8 +74,9 @@ class Strategy(GufeTokenizable):
     def _to_dict(self) -> dict:
         return {"settings": self._settings}
 
+    # TODO: Return type from typing.Self when Python 3.10 is no longer supported
     @classmethod
-    def _from_dict(cls, dct: dict) -> Self:
+    def _from_dict(cls, dct: dict):
         return cls(**dct)
 
     @classmethod
@@ -87,13 +88,13 @@ class Strategy(GufeTokenizable):
     def _propose(
         self,
         alchemical_network: AlchemicalNetwork,
-        protocol_results: dict[GufeKey, _ProtocolResult],
+        protocol_results: dict[GufeKey, TProtocolResult],
     ) -> StrategyResult:
         raise NotImplementedError
 
     def propose(
         self,
         alchemical_network: AlchemicalNetwork,
-        protocol_results: dict[GufeKey, _ProtocolResult],
+        protocol_results: dict[GufeKey, TProtocolResult],
     ) -> StrategyResult:
         return self._propose(alchemical_network, protocol_results)
