@@ -1,2 +1,3 @@
-/stratocaster.egg-info/
-/stratocaster/__pycache__/
+/src/stratocaster/stratocaster.egg-info/
+/src/stratocaster/__pycache__/
+docs/_build/
