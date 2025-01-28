@@ -1,6 +1,6 @@
 from gufe.settings.models import SettingsBaseModel
 
 
-# TODO: docstrings
 class StrategySettings(SettingsBaseModel):
+    """Base class for Strategy settings."""
     pass

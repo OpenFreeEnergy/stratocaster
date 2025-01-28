@@ -8,8 +8,8 @@ from .models import StrategySettings
 
 TProtocolResult = TypeVar("TProtocolResult", bound=ProtocolResult)
 
-# TODO: docstrings
 class StrategyResult(GufeTokenizable):
+    """Results produced by a Strategy."""
 
     def __init__(self, weights: dict[GufeKey, float | None]):
         self._weights = weights
@@ -31,6 +31,7 @@ class StrategyResult(GufeTokenizable):
         return self._weights
 
     def resolve(self) -> dict[GufeKey, float | None]:
+        """Normalize the proposal weights relative to all non-None Transformation weights."""
         weights = self.weights
         weight_sum = sum([weight for weight in weights.values() if weight is not None])
         modified_weights = {
@@ -42,9 +43,9 @@ class StrategyResult(GufeTokenizable):
         return weights
 
 
-# TODO: docstrings
 class Strategy(GufeTokenizable):
-    """An object that proposes the relative urgency of computing transformations within an AlchemicalNetwork."""
+    """An object that proposes the relative urgency of computing
+    transformations within an AlchemicalNetwork."""
 
     _settings_cls: type[StrategySettings]
 
@@ -97,4 +98,20 @@ class Strategy(GufeTokenizable):
         alchemical_network: AlchemicalNetwork,
         protocol_results: dict[GufeKey, TProtocolResult],
     ) -> StrategyResult:
+        """Compute Transformation weights from the ProtocolResults of
+        the Transformations.
+
+        Parameters
+        ----------
+        alchemical_network: AlchemicalNetwork
+            The AlchemicalNetwork containing the Transformations.
+        protocol_results: dict[GufeKey, ProtocolResult]
+            A dictionary of Transformation GufeKeys paired with the
+            Transformation's ProtocolResults.
+
+        Returns
+        -------
+        StrategyResult
+
+        """
         return self._propose(alchemical_network, protocol_results)

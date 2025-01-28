@@ -16,8 +16,8 @@ except ImportError:
 import pydantic
 
 
-# TODO: docstrings
 class ConnectivityStrategySettings(StrategySettings):
+    """Specific settings required for the ConnectivityStrategy."""
 
     decay_rate: float = Field(
         default=0.5, description="decay rate of the exponential decay penalty factor"
@@ -53,6 +53,7 @@ class ConnectivityStrategySettings(StrategySettings):
 
     @root_validator
     def check_cutoff_or_max_runs(cls, values):
+        """Check that at either max_runs or cutoff is set."""
         max_runs, cutoff = values.get("max_runs"), values.get("cutoff")
 
         if max_runs is None and cutoff is None:
@@ -61,12 +62,30 @@ class ConnectivityStrategySettings(StrategySettings):
         return values
 
 
-# TODO: docstrings
 class ConnectivityStrategy(Strategy):
+    """A Strategy that suggests Transformations which lead to nodes
+    with higher degrees of connectivity.
+
+    The Transformation for a given Transformation is calculated as the
+    average number of connections both of its end states has.
+    """
 
     _settings_cls = ConnectivityStrategySettings
 
-    def _exponential_decay_scaling(self, number_of_results: int, decay_rate: float):
+    def _exponential_decay_scaling(self, number_of_results: int, decay_rate: float) -> float:
+        """Transformation weight decay factor.
+
+        Parameters
+        ----------
+        number_of_results: int
+            The number of results already obtained for the Transformation.
+        decay_rate: float
+            The rate at which the weight should decay with the number of results.
+
+        Returns
+        -------
+        float
+        """
         return decay_rate**number_of_results
 
     def _propose(
