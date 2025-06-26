@@ -85,6 +85,16 @@ class Strategy(GufeTokenizable):
     def _default_settings(cls) -> StrategySettings:
         raise NotImplementedError
 
+    @classmethod
+    def default_settings(cls) -> StrategySettings:
+        """Get the default settings for this ``Strategy``.
+
+        These represent the current recommendations for the use of this
+        particular ``Strategy``. These can be modified and passed in as the
+        only argument for creating a new ``Strategy`` instance.
+        """
+        return cls._default_settings()
+
     @abc.abstractmethod
     def _propose(
         self,
