@@ -1,4 +1,4 @@
-<img src="docs/assets/logo/stratocaster_logo_full.png" alt="stratocaster" width="200"/>
+<img src="docs/assets/logo/stratocaster_logo_full.png" alt="stratocaster" width="300"/>
 
 # stratocaster
 
