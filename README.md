@@ -16,3 +16,7 @@ Find the documentation for stratocaster on [Read the Docs](https://stratocaster.
 ## License
 
 This project is released under the [MIT license](./LICENSE).
+
+---
+
+stratocaster logo by Jenke Scheen is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0).
