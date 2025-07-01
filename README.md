@@ -1,6 +1,6 @@
 <img src="docs/assets/logo/stratocaster_logo_full.png" alt="stratocaster" width="300"/>
 
-# stratocaster
+---
 
 [![CI](https://github.com/OpenFreeEnergy/stratocaster/actions/workflows/tests.yaml/badge.svg)](https://github.com/OpenFreeEnergy/stratocaster/actions/workflows/tests.yaml)
 
