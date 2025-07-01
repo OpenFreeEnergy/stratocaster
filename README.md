@@ -1,4 +1,4 @@
-![stratocaster](docs/assets/logo/stratocaster_logo_full.png)
+<img src="docs/assets/logo/stratocaster_logo_full.png" alt="stratocaster" width="200"/>
 
 # stratocaster
 
