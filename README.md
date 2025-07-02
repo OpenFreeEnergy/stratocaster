@@ -19,4 +19,4 @@ This project is released under the [MIT license](./LICENSE).
 
 ---
 
-stratocaster logo by Jenke Scheen is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0).
+stratocaster logo by Jenke Scheen, copyright Datryllic LLC, is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0).
