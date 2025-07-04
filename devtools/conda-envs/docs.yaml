@@ -4,5 +4,4 @@ channels:
 
 dependencies:
   - python>=3.12
-  - pip:
-    - git+https://github.com/OpenFreeEnergy/ofe-sphinx-theme
+  - furo
