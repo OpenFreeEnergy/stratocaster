@@ -2,6 +2,7 @@ import pytest
 from gufe import AlchemicalNetwork, ProtocolResult
 from gufe.tokenization import GufeKey
 from gufe.tests.test_protocol import DummyProtocolResult
+from openff.units import unit
 
 from stratocaster.base.strategy import StrategyResult
 from stratocaster.strategies.uncertainty import (
@@ -23,37 +24,40 @@ class MockProtocolResult(ProtocolResult):
     
     def __init__(self, n_protocol_dag_results: int, uncertainty: float, **kwargs):
         self._n_protocol_dag_results = n_protocol_dag_results
-        self._uncertainty = uncertainty
+        # Convert uncertainty to unit.Quantity if it's a float
+        if hasattr(uncertainty, 'to'):
+            self._uncertainty = uncertainty
+        else:
+            self._uncertainty = uncertainty * unit.kilocalorie_per_mole
         super().__init__(**kwargs)
     
     @property
     def n_protocol_dag_results(self) -> int:
         return self._n_protocol_dag_results
     
-    @property
-    def uncertainty(self) -> float:
+    def get_uncertainty(self) -> unit.Quantity:
         return self._uncertainty
 
 
 # Valid settings combinations for testing
 SETTINGS_VALID = [
-    (0.5, 3, 5.0, 20),  # target_uncertainty, min_samples, max_uncertainty_cap, max_samples
-    (1.0, 1, 10.0, 50),
-    (0.1, 5, 2.0, 10),
+    (0.5 * unit.kilocalorie_per_mole, 3, 5.0 * unit.kilocalorie_per_mole, 20),  # target_uncertainty, min_samples, max_uncertainty_cap, max_samples
+    (1.0 * unit.kilocalorie_per_mole, 1, 10.0 * unit.kilocalorie_per_mole, 50),
+    (0.1 * unit.kilocalorie_per_mole, 5, 2.0 * unit.kilocalorie_per_mole, 10),
 ]
 
 
 @pytest.mark.parametrize(
     ["target_uncertainty", "min_samples", "max_uncertainty_cap", "max_samples", "raises"],
     [
-        (0, 3, 5.0, 20, ValueError),     # target_uncertainty too low
-        (11, 3, 5.0, 20, ValueError),    # target_uncertainty too high
-        (0.5, 0, 5.0, 20, ValueError),   # min_samples too low
-        (0.5, 101, 5.0, 20, ValueError), # min_samples too high
-        (0.5, 3, 0, 20, ValueError),     # max_uncertainty_cap too low
-        (0.5, 3, 21, 20, ValueError),    # max_uncertainty_cap too high
-        (0.5, 3, 5.0, 0, ValueError),    # max_samples too low
-        (0.5, 3, 5.0, 1001, ValueError), # max_samples too high
+        (0 * unit.kilocalorie_per_mole, 3, 5.0 * unit.kilocalorie_per_mole, 20, ValueError),     # target_uncertainty too low
+        (11 * unit.kilocalorie_per_mole, 3, 5.0 * unit.kilocalorie_per_mole, 20, ValueError),    # target_uncertainty too high
+        (0.5 * unit.kilocalorie_per_mole, 0, 5.0 * unit.kilocalorie_per_mole, 20, ValueError),   # min_samples too low
+        (0.5 * unit.kilocalorie_per_mole, 101, 5.0 * unit.kilocalorie_per_mole, 20, ValueError), # min_samples too high
+        (0.5 * unit.kilocalorie_per_mole, 3, 0 * unit.kilocalorie_per_mole, 20, ValueError),     # max_uncertainty_cap too low
+        (0.5 * unit.kilocalorie_per_mole, 3, 21 * unit.kilocalorie_per_mole, 20, ValueError),    # max_uncertainty_cap too high
+        (0.5 * unit.kilocalorie_per_mole, 3, 5.0 * unit.kilocalorie_per_mole, 0, ValueError),    # max_samples too low
+        (0.5 * unit.kilocalorie_per_mole, 3, 5.0 * unit.kilocalorie_per_mole, 1001, ValueError), # max_samples too high
     ]
     + [(*vals, None) for vals in SETTINGS_VALID],  # include all valid settings
 )
@@ -292,16 +296,16 @@ def test_propose_mixed_scenarios(
 def test_custom_settings():
     """Test strategy with custom settings."""
     custom_settings = UncertaintyStrategySettings(
-        target_uncertainty=1.0,
+        target_uncertainty=1.0 * unit.kilocalorie_per_mole,
         min_samples=5,
-        max_uncertainty_cap=3.0,
+        max_uncertainty_cap=3.0 * unit.kilocalorie_per_mole,
         max_samples=10
     )
     strategy = UncertaintyStrategy(custom_settings)
     
-    assert strategy.settings.target_uncertainty == 1.0
+    assert strategy.settings.target_uncertainty == 1.0 * unit.kilocalorie_per_mole
     assert strategy.settings.min_samples == 5
-    assert strategy.settings.max_uncertainty_cap == 3.0
+    assert strategy.settings.max_uncertainty_cap == 3.0 * unit.kilocalorie_per_mole
     assert strategy.settings.max_samples == 10
 
 
@@ -311,7 +315,7 @@ def test_default_settings():
     settings = strategy.settings
     
     assert isinstance(settings, UncertaintyStrategySettings)
-    assert settings.target_uncertainty == 0.5
+    assert settings.target_uncertainty == 0.5 * unit.kilocalorie_per_mole
     assert settings.min_samples == 3
-    assert settings.max_uncertainty_cap == 5.0
+    assert settings.max_uncertainty_cap == 5.0 * unit.kilocalorie_per_mole
     assert settings.max_samples == 20

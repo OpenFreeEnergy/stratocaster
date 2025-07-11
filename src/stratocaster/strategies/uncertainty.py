@@ -1,5 +1,6 @@
 from gufe import AlchemicalNetwork, ProtocolResult
 from gufe.tokenization import GufeKey
+from openff.units import unit
 
 from stratocaster.base import Strategy, StrategyResult
 from stratocaster.base.models import StrategySettings
@@ -18,17 +19,17 @@ import pydantic
 class UncertaintyStrategySettings(StrategySettings):
     """Specific settings required for the UncertaintyStrategy."""
 
-    target_uncertainty: float = Field(
-        default=0.5, 
-        description="Target uncertainty threshold in kcal/mol; transformations with higher uncertainty get priority"
+    target_uncertainty: unit.Quantity = Field(
+        default=0.5 * unit.kilocalorie_per_mole, 
+        description="Target uncertainty threshold; transformations with higher uncertainty get priority"
     )
     min_samples: int = Field(
         default=3,
         description="Minimum number of protocol DAG results before considering uncertainty"
     )
-    max_uncertainty_cap: float = Field(
-        default=5.0,
-        description="Maximum uncertainty cap in kcal/mol; transformations above this are considered problematic"
+    max_uncertainty_cap: unit.Quantity = Field(
+        default=5.0 * unit.kilocalorie_per_mole,
+        description="Maximum uncertainty cap; transformations above this are considered problematic"
     )
     max_samples: int = Field(
         default=20,
@@ -37,7 +38,15 @@ class UncertaintyStrategySettings(StrategySettings):
 
     @validator("target_uncertainty")
     def validate_target_uncertainty(cls, value):
-        if not (0 < value <= 10):
+        # Convert to kcal/mol for validation if needed
+        if hasattr(value, 'to'):
+            value_in_kcal_mol = value.to(unit.kilocalorie_per_mole).magnitude
+        else:
+            # Assume it's already in kcal/mol if no units
+            value_in_kcal_mol = float(value)
+            value = value * unit.kilocalorie_per_mole
+        
+        if not (0 < value_in_kcal_mol <= 10):
             raise ValueError("`target_uncertainty` must be between 0 and 10 kcal/mol")
         return value
 
@@ -49,7 +58,15 @@ class UncertaintyStrategySettings(StrategySettings):
 
     @validator("max_uncertainty_cap")
     def validate_max_uncertainty_cap(cls, value):
-        if not (0 < value <= 20):
+        # Convert to kcal/mol for validation if needed
+        if hasattr(value, 'to'):
+            value_in_kcal_mol = value.to(unit.kilocalorie_per_mole).magnitude
+        else:
+            # Assume it's already in kcal/mol if no units
+            value_in_kcal_mol = float(value)
+            value = value * unit.kilocalorie_per_mole
+        
+        if not (0 < value_in_kcal_mol <= 20):
             raise ValueError("`max_uncertainty_cap` must be between 0 and 20 kcal/mol")
         return value
 
@@ -131,7 +148,12 @@ class UncertaintyStrategy(Strategy):
                 continue
             
             # Get uncertainty from the result
-            uncertainty = result.uncertainty
+            uncertainty = result.get_uncertainty()
+            
+            # Ensure uncertainty has units for comparison
+            if not hasattr(uncertainty, 'to'):
+                # Assume uncertainty is in kcal/mol if no units
+                uncertainty = uncertainty * unit.kilocalorie_per_mole
             
             # Cap extremely high uncertainties (might indicate problematic transformations)
             if uncertainty > settings.max_uncertainty_cap:
@@ -142,7 +164,7 @@ class UncertaintyStrategy(Strategy):
             if uncertainty > settings.target_uncertainty:
                 # Scale weight by how much uncertainty exceeds target
                 excess_uncertainty = uncertainty - settings.target_uncertainty
-                weight = min(1.0, excess_uncertainty / settings.target_uncertainty)
+                weight = min(1.0, (excess_uncertainty / settings.target_uncertainty).magnitude)
                 weights[transformation_key] = weight
             else:
                 # Below target uncertainty - sufficient precision achieved
