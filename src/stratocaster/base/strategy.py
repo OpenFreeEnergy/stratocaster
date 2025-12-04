@@ -8,6 +8,7 @@ from .models import StrategySettings
 
 TProtocolResult = TypeVar("TProtocolResult", bound=ProtocolResult)
 
+
 class StrategyResult(GufeTokenizable):
     """Results produced by a Strategy."""
 
