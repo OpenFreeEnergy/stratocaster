@@ -187,7 +187,7 @@ def disconnected_fanning_network(branch=3, depth=3):
 
     G.add_edges_from(edges)
 
-    assert not nx.is_connected(G.to_undirected())
+    assert not nx.is_weakly_connected(G)
 
     an = digraph_to_alchemical_network(G)
     return an
