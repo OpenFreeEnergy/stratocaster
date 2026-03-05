@@ -21,4 +21,14 @@ def test_propose_no_results(
     default_strategy: RadialGrowthStrategy, fanning_network: AlchemicalNetwork
 ):
     proposal: StrategyResult = default_strategy.propose(fanning_network, {})
-    raise NotImplementedError
+    # check that there is at least 1 non-None weight
+    assert not all(proposal.weights.values())
+
+
+def test_disconnected(
+    default_strategy: RadialGrowthStrategy,
+    disconnected_fanning_network: AlchemicalNetwork,
+):
+    proposal: StrategyResult = default_strategy.propose(
+        disconnected_fanning_network, {}
+    )
