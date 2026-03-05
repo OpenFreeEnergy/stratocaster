@@ -8,13 +8,7 @@ from stratocaster.strategies.radialgrowth import (
 )
 from stratocaster.tests.networks import (
     benzene_variants_star_map as _benzene_variants_star_map,
-    fanning_network as _fanning_network,
 )
-
-
-@pytest.fixture(scope="module")
-def fanning_network():
-    return _fanning_network()
 
 
 @pytest.fixture

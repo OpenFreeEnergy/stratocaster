@@ -174,6 +174,25 @@ def dual_center_fanning_network(branch=3, depth=3):
     return an
 
 
+def disconnected_fanning_network(branch=3, depth=3):
+    """Generate a network with disconnected fanning subgraphs."""
+
+    G = nx.DiGraph()
+
+    edges = set()
+
+    sampler = int_sampler(sampler_start=2)
+    edges |= fan(0, branch=branch, depth=depth, id_generator=sampler)
+    edges |= fan(1, branch=branch, depth=depth, id_generator=sampler)
+
+    G.add_edges_from(edges)
+
+    assert not nx.is_connected(G.to_undirected())
+
+    an = digraph_to_alchemical_network(G)
+    return an
+
+
 def fan(node, branch=3, depth=3, id_generator=None):
     """Recursive edge generator."""
 

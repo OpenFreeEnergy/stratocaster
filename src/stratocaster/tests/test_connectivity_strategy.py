@@ -11,15 +11,6 @@ from stratocaster.strategies.connectivity import (
     ConnectivityStrategy,
     ConnectivityStrategySettings,
 )
-from stratocaster.tests.networks import (
-    benzene_variants_star_map as _benzene_variants_star_map,
-)
-
-
-@pytest.fixture(scope="module")
-def benzene_variants_star_map():
-    return _benzene_variants_star_map()
-
 
 from gufe.tokenization import GufeKey
 
