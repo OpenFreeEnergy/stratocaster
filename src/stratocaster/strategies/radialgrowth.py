@@ -117,16 +117,22 @@ class RadialGrowthStrategy(Strategy):
 
             # save the upper eccentricity for later when we know the lowest_completed
             transformation_eccentricity[transformation_key] = upper
-
             weights[transformation_key] = factor_repeats
 
         distance_factor = 1
         for transformation_key, e in transformation_eccentricity.items():
             distance = e - lowest_complete_eccentricity
 
-            if distance <= 1:
-                distance_factor = 1
-            if distance > self.settings.candidacy_max_distance:
+            if distance <= self.settings.candidacy_max_distance:
+                # edge case where there are multiple vertices with
+                # eccentricity equal to graph radius
+                if distance == 0:
+                    distance_factor = 1
+                else:
+                    distance_factor = self.settings.decay_distance_rate ** (
+                        distance - 1
+                    )
+            else:
                 distance_factor = 0
 
             weights[transformation_key] *= distance_factor
