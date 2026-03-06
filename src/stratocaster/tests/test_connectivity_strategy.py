@@ -20,7 +20,7 @@ from gufe.tokenization import GufeKey
 class TestConnectivityStrategy(StrategyTestMixin):
 
     strategy_class = ConnectivityStrategy
-    valid_settings = ((0.5, 0.1, 10), (0.1, None, 10), (0.5, 0.1, None))
+    valid_settings = {(0.5, 0.1, 10), (0.1, None, 10), (0.5, 0.1, None)}
 
     @pytest.mark.parametrize(["decay_rate", "cutoff", "max_runs"], valid_settings)
     def test_simulated_termination(

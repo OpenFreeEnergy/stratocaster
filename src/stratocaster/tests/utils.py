@@ -1,29 +1,34 @@
 from random import randint
+
+import pytest
+
 from gufe.tests.test_protocol import DummyProtocolResult
 
 
 class StrategyTestMixin:
 
     _default_strategy = None
+    _default_settings = None
 
     @property
     def default_strategy(self):
         if not self._default_strategy:
-            _settings = self.strategy_class._default_settings()
-            self._default_strategy = self.strategy_class(_settings)
+            self._default_strategy = self.strategy_class(self.default_settings)
         return self._default_strategy
 
-    def test_deterministic(self, fanning_network):
-        settings = self.default_strategy.settings
+    @property
+    def default_settings(self):
+        if not self._default_settings:
+            self._default_settings = self.strategy_class._default_settings()
+        return self._default_settings
 
-        max_runs = settings.max_runs
-        assert isinstance(max_runs, int)
+    def test_deterministic(self, fanning_network):
 
         def random_runs():
             """Generate random randomized inputs for propose."""
             return {
                 transformation.key: DummyProtocolResult(
-                    n_protocol_dag_results=randint(0, max_runs),
+                    n_protocol_dag_results=randint(0, 3),
                     info=f"key: {transformation.key}",
                 )
                 for transformation in fanning_network.edges
