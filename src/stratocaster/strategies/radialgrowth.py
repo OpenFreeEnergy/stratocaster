@@ -66,31 +66,35 @@ class RadialGrowthStrategySettings(StrategySettings):
 
 
 class RadialGrowthStrategy(Strategy):
-    """A Strategy that favors Transformations close to the network
+    r"""A Strategy that favors Transformations close to the network
     center.
 
-    The weight proposed for each Transformation depends on its highest
-    ChemicalSystem distance from the lowest completed tier of
-    distances. For the graph below, if at least one ProtocolDAGResult
-    exists for both edges in 3-2-3, then the lowest completed distance
-    is 3. If only one edge has a result or neither has a result, then
-    the lowest complete distance is 2. In the prior case, a
-    transformation going from 3 to 4 then has an effective distance of
-    1, while the later case has a distance of 2.
+    The weight assigned to each Transformation depends on its highest
+    ChemicalSystem distance, as measured and labeled by the vertex
+    eccentricty, from the lowest completed tier of distances. In the
+    graph below, if at least one ``ProtocolDAGResult`` exists for both
+    edges in 3-2-3, the lowest completed distance is 3. If neither
+    edge or only one edge has a result, the lowest completed distance
+    is 2. In the former case, a transformation going from 3 to 4 has
+    an effective distance of 1, while in the latter case it has a
+    distance of 2.
 
-    4         4
-     \       /
-      \     /
-    4--3-2-3--4
-      /     \
-     /       \
-    4         4
+    .. code-block::
 
-    The strategy will penialize transformations that have high
-    effective distances by multiplying the weight with a penalty of
-    r^d where r is a user specified decay rate and d is the effective
-    distance. The candidacy_max_distance setting limits how far out
-    transformations can be assigned non-zero weights.
+        4         4
+         \       /
+          \     /
+        4--3-2-3--4
+          /     \
+         /       \
+        4         4
+
+    The strategy penalizes transformations that have high effective
+    distances by multiplying the weight with a penalty of :math:`r^d`, where r
+    is a user-specified decay rate and d is the effective
+    distance. The ``candidacy_max_distance`` setting limits how far
+    out transformations can be assigned non-zero weights.
+
     """
 
     _settings_cls = RadialGrowthStrategySettings
@@ -177,7 +181,6 @@ class RadialGrowthStrategy(Strategy):
             weights[transformation_key] = factor_repeats
 
         # start applying weights due to effective distance
-        distance_factor = 1
         for transformation_key, e in transformation_eccentricity.items():
             distance = e - lowest_complete_eccentricity
 

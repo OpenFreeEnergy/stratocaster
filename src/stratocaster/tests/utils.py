@@ -4,8 +4,21 @@ import pytest
 
 from gufe.tests.test_protocol import DummyProtocolResult
 
+from stratocaster.base.strategy import StrategyResult
+
 
 class StrategyTestMixin:
+    r"""A mixin base class for testing strategies.
+
+    All tests defined in this base class should include a ``settings``
+    keyword argument, defaulting to ``None``. This requirement ensures
+    predictable pytest parametrization in derived strategy tests. The
+    ``StrategyTestMixin.strategy_or_default`` method, when called with
+    optional settings, will return either a strategy configured with
+    the provided settings or the default strategy established by the
+    strategy author.
+
+    """
 
     _default_strategy = None
     _default_settings = None
@@ -41,7 +54,7 @@ class StrategyTestMixin:
 
         for _ in range(10):
             random_protocol_results = random_runs()
-            proposal = self.default_strategy.propose(
+            proposal = strategy.propose(
                 fanning_network, protocol_results=random_protocol_results
             )
             for _ in range(3):
