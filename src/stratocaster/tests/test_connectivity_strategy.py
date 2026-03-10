@@ -20,14 +20,13 @@ from gufe.tokenization import GufeKey
 class TestConnectivityStrategy(StrategyTestMixin):
 
     strategy_class = ConnectivityStrategy
-    valid_settings = {(0.5, 0.1, 10), (0.1, None, 10), (0.5, 0.1, None)}
+    valid_settings = [
+        ConnectivityStrategySettings(decay_rate=dr, cutoff=co, max_runs=mr)
+        for dr, co, mr in {(0.5, 0.1, 10), (0.1, None, 10), (0.5, 0.1, None)}
+    ]
 
-    @pytest.mark.parametrize(["decay_rate", "cutoff", "max_runs"], valid_settings)
-    def test_simulated_termination(self, fanning_network, decay_rate, cutoff, max_runs):
-
-        settings = ConnectivityStrategySettings(
-            decay_rate=decay_rate, cutoff=cutoff, max_runs=max_runs
-        )
+    @pytest.mark.parametrize("settings", valid_settings)
+    def test_simulated_termination(self, fanning_network, settings):
 
         StrategyTestMixin.test_simulated_termination(
             self, fanning_network, settings=settings
@@ -114,24 +113,17 @@ class TestConnectivityStrategy(StrategyTestMixin):
         )
 
     @pytest.mark.parametrize(
-        ["decay_rate", "cutoff", "max_runs", "raises"],
+        ["decay_rate", "cutoff", "max_runs"],
         [
-            (0, None, None, ValueError),
-            (1, None, None, ValueError),
-            (0.5, 0, None, ValueError),
-            (0.5, None, 0, ValueError),
-        ]
-        + [(*vals, None) for vals in valid_settings],  # include all valid settings
+            (0, None, None),
+            (1, None, None),
+            (0.5, 0, None),
+            (0.5, None, 0),
+        ],
     )
-    def test_connectivity_strategy_settings(self, decay_rate, cutoff, max_runs, raises):
+    def test_connectivity_strategy_invalid_settings(self, decay_rate, cutoff, max_runs):
 
-        def instantiate_settings():
+        with pytest.raises(ValueError):
             ConnectivityStrategySettings(
                 decay_rate=decay_rate, cutoff=cutoff, max_runs=max_runs
             )
-
-        if raises:
-            with pytest.raises(raises):
-                instantiate_settings()
-        else:
-            instantiate_settings()
