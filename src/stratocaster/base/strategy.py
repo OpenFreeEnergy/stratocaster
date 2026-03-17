@@ -33,7 +33,7 @@ class StrategyResult(GufeTokenizable):
 
     def resolve(self) -> dict[GufeKey, float | None]:
         """Normalize the proposal weights relative to all non-None Transformation weights."""
-        weights = self.weights
+        weights = dict(self.weights)
         weight_sum = sum([weight for weight in weights.values() if weight is not None])
         modified_weights = {
             key: weight / weight_sum

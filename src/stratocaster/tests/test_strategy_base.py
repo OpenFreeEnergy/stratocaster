@@ -17,6 +17,16 @@ class TestStrategyResult:
     def test_dict_roundtrip(self):
         assert StrategyResult.from_dict(self.result.to_dict()) == self.result
 
+    def test_resolve_does_not_mutate_weights(self):
+        original_weights = dict(self.result.weights)
+        self.result.resolve()
+        assert self.result.weights == original_weights
+
+    def test_resolve_is_idempotent(self):
+        first = self.result.resolve()
+        second = self.result.resolve()
+        assert first == second
+
 
 class DummyStrategySettings(StrategySettings):
     pass
