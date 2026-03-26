@@ -6,7 +6,7 @@
 AlchemicalNetwork Transformation Prioritization Library
 #######################################################################
 
-The stratocaster library is complimentary to gufe and provides suggestions, via Strategies, for optimally executing Transformation Protocols defined in AlchemicalNetworks.
+The stratocaster library is complementary to `gufe <https://gufe.openfree.energy/>`_ and provides suggestions, via Strategies, for optimally executing Transformation Protocols defined in AlchemicalNetworks.
 
 This library includes a set of Strategy implementations as well as base classes to facilitate the creation of custom Strategy implementations.
 
