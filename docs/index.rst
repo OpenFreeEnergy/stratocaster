@@ -6,11 +6,12 @@
 alchemical effort allocation, automated
 #######################################################################
 
-**stratocaster** introduces the concept of a ``Strategy`` to the `Open Free Energy`_ ecosystem: given an ``AlchemicalNetwork`` and any existing results for its ``Transformation``\s, a ``Strategy`` proposes where to apply additional computational effort to produce result data in an "optimal" way.
-Different ``Strategy`` implementations define "optimal" differently, with the choice of ``Strategy`` left to users.
+**stratocaster** is a ``Strategy`` library for the `Open Free Energy`_ ecosystem: given an ``AlchemicalNetwork`` and any existing results for its ``Transformation``\s, a ``Strategy`` proposes where to apply additional computational effort to produce result data in an "optimal" way.
+Different ``Strategy`` implementations define "optimal" differently, with the choice of ``Strategy`` determined by the application.
 
-**stratocaster** includes many such ``Strategy`` implementations, as well as base classes and instructions to help users create their own.
-A ``Strategy`` can be used in directly on its own, or in combination with an automated execution system such as `alchemiscale`_ or `exorcist`_.
+**stratocaster** includes many such ``Strategy`` implementations, as well as base classes and guidance for creating new ones.
+A ``Strategy`` can be used directly on its own, or in combination with an automated execution system such as `alchemiscale`_ or `exorcist`_.
+**stratocaster** is fully open source under the **MIT license**.
 
 .. _Open Free Energy: https://openfree.energy/
 .. _alchemiscale: https://alchemiscale.org/
