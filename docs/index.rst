@@ -10,7 +10,7 @@ alchemical effort allocation, automated
 Different ``Strategy`` implementations define "optimal" differently, with the choice of ``Strategy`` left to users.
 
 **stratocaster** includes many such ``Strategy`` implementations, as well as base classes and instructions to help users create their own.
-A ``Strategy`` be used in directly on its own, or in combination with an automated execution system such as `alchemiscale`_ or `exorcist`_.
+A ``Strategy`` can be used in directly on its own, or in combination with an automated execution system such as `alchemiscale`_ or `exorcist`_.
 
 .. _Open Free Energy: https://openfree.energy/
 .. _alchemiscale: https://alchemiscale.org/
