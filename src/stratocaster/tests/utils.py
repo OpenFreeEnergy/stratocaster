@@ -43,7 +43,7 @@ class StrategyTestMixin:
         strategy = self.strategy_or_default(settings)
 
         def random_runs():
-            """Generate random randomized inputs for propose."""
+            """Generate random inputs for propose."""
             return {
                 transformation.key: DummyProtocolResult(
                     n_protocol_dag_results=randint(0, 3),

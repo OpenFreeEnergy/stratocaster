@@ -5,11 +5,8 @@ from gufe.tokenization import GufeKey
 
 from pydantic import (
     Field,
-    model_validator,
     field_validator,
 )
-
-import pydantic
 
 from stratocaster.base import Strategy, StrategyResult
 from stratocaster.base.models import StrategySettings
@@ -20,12 +17,12 @@ class RadialGrowthStrategySettings(StrategySettings):
 
     max_runs: int = Field(
         default=3,
-        description="the upper limit of protocol DAG results needed before a transformation is no longer weighed",
+        description="the upper limit of ProtocolDAG results needed before a Transformation is no longer weighed",
     )
 
     candidacy_max_distance: int = Field(
         default=1,
-        description="the maximum distance a candidate chemical can be from previously reached chemical systems",
+        description="the maximum distance a candidate ChemicalSystem can be from previously reached ChemicalSystems",
     )
 
     decay_repeat_rate: float = Field(
@@ -45,7 +42,7 @@ class RadialGrowthStrategySettings(StrategySettings):
         return value
 
     @field_validator("candidacy_max_distance", mode="before")
-    def validate_candidtate_max_distance(cls, value):
+    def validate_candidate_max_distance(cls, value):
         if not value >= 1:
             raise ValueError(
                 "`candidtate_max_distance` must be greater than or equal to 1"
@@ -160,7 +157,6 @@ class RadialGrowthStrategy(Strategy):
                     if upper < lowest_complete_eccentricity:
                         lowest_complete_eccentricity = lower
                 case pr:
-                    assert isinstance(pr, ProtocolResult)
                     transformation_n_protcol_dag_results = pr.n_protocol_dag_results
                     # scale the repeat factor to discourage reruns as
                     # specified by the user's decay_repeat_rate
