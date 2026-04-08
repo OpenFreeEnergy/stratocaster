@@ -29,19 +29,18 @@ class StrategyResult(GufeTokenizable):
 
     @property
     def weights(self) -> dict[GufeKey, float | None]:
-        return self._weights
+        return self._weights.copy()
 
     def resolve(self) -> dict[GufeKey, float | None]:
-        """Normalize the proposal weights relative to all non-None Transformation weights."""
-        weights = self.weights
-        weight_sum = sum([weight for weight in weights.values() if weight is not None])
-        modified_weights = {
-            key: weight / weight_sum
-            for key, weight in weights.items()
-            if weight is not None
+        """Get normalized proposal weights relative to all non-None Transformation weights."""
+        weight_sum = sum(
+            [weight for weight in self._weights.values() if weight is not None]
+        )
+        normalized_weights = {
+            key: weight / weight_sum if weight is not None else None
+            for key, weight in self._weights.items()
         }
-        weights.update(modified_weights)
-        return weights
+        return normalized_weights
 
     def __or__(self, other):
         if self.weights.keys() & other.weights.keys():
