@@ -43,6 +43,13 @@ class StrategyResult(GufeTokenizable):
         weights.update(modified_weights)
         return weights
 
+    def __or__(self, other):
+        if self.weights.keys() & other.weights.keys():
+            raise ValueError(
+                "StrategyResults can only be combined when their transformation keys are mutually exclusive."
+            )
+        return StrategyResult(self.weights | other.weights)
+
 
 class Strategy(GufeTokenizable):
     """An object that proposes the relative urgency of computing
@@ -125,4 +132,8 @@ class Strategy(GufeTokenizable):
         StrategyResult
 
         """
-        return self._propose(alchemical_network, protocol_results)
+        subgraphs = alchemical_network.connected_subgraphs()
+        acc = StrategyResult({})
+        for subgraph in subgraphs:
+            acc |= self._propose(subgraph, protocol_results)
+        return acc
