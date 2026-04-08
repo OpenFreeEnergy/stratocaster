@@ -6,7 +6,7 @@
 alchemical effort allocation, automated
 #######################################################################
 
-**stratocaster** is a ``Strategy`` library for the `Open Free Energy`_ ecosystem: given an ``AlchemicalNetwork`` and any existing results for its ``Transformation``\s, a ``Strategy`` proposes where to apply additional computational effort to produce result data in an "optimal" way.
+**stratocaster** is a ``Strategy`` library built on top of `gufe <https://gufe.openfree.energy/>`_ for the `Open Free Energy`_ ecosystem: given an ``AlchemicalNetwork`` and any existing results for its ``Transformation``\s, a ``Strategy`` proposes where to apply additional computational effort to produce result data in an "optimal" way.
 Different ``Strategy`` implementations define "optimal" differently, with the choice of ``Strategy`` determined by the application.
 
 **stratocaster** includes many such ``Strategy`` implementations, as well as base classes and guidance for creating new ones.
