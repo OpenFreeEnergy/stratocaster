@@ -58,7 +58,7 @@ class StrategyTestMixin:
                 fanning_network, protocol_results=random_protocol_results
             )
             for _ in range(3):
-                _proposal = self.default_strategy.propose(
+                _proposal = strategy.propose(
                     fanning_network, protocol_results=random_protocol_results
                 )
                 assert _proposal == proposal
