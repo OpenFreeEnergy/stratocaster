@@ -11,6 +11,7 @@ import importlib
 
 import gufe
 from gufe.tests.test_protocol import DummyProtocol
+import networkx as nx
 from openff.units import unit
 from rdkit import Chem
 
@@ -115,3 +116,94 @@ def benzene_variants_star_map():
     return gufe.AlchemicalNetwork(
         solvated_ligand_transformations + solvated_complex_transformations
     )
+
+
+def digraph_to_alchemical_network(digraph):
+    """Convert a digraph to an AlchemicalNetwork."""
+    node_to_chemical_system = lambda n: gufe.ChemicalSystem({}, name=n)
+
+    transformations = []
+    for a, b in digraph.edges():
+        c_a = node_to_chemical_system(a)
+        c_b = node_to_chemical_system(b)
+        protocol = None
+        transformation = gufe.Transformation(
+            c_a, c_b, DummyProtocol(settings=DummyProtocol.default_settings())
+        )
+        transformations.append(transformation)
+
+    return gufe.AlchemicalNetwork(transformations)
+
+
+def int_sampler(sampler_start=0):
+    num = sampler_start
+    while True:
+        yield num
+        num += 1
+
+
+def fanning_network(branch=3, depth=3):
+    """Generate a network with a central node that recursively "fans"
+    out.  Branch determines how many edges branch off of each node
+    while depth determines how many times the process is repeated.
+    """
+    G = nx.DiGraph()
+    G.add_edges_from(fan(0, branch=branch, depth=depth))
+    an = digraph_to_alchemical_network(G)
+    return an
+
+
+def dual_center_fanning_network(branch=3, depth=3):
+    """Generate a network with two central nodes that recursively
+    "fan" out.  Branch determines how many edges branch off of each
+    node while depth determines how many times the process is
+    repeated.
+    """
+
+    G = nx.DiGraph()
+
+    edges = {(0, 1)}
+
+    sampler = int_sampler(sampler_start=2)
+    edges |= fan(0, branch=branch, depth=depth, id_generator=sampler)
+    edges |= fan(1, branch=branch, depth=depth, id_generator=sampler)
+
+    G.add_edges_from(edges)
+
+    an = digraph_to_alchemical_network(G)
+    return an
+
+
+def disconnected_fanning_network(branch=3, depth=3):
+    """Generate a network with disconnected fanning subgraphs."""
+
+    G = nx.DiGraph()
+
+    edges = set()
+
+    sampler = int_sampler(sampler_start=2)
+    edges |= fan(0, branch=branch, depth=depth, id_generator=sampler)
+    edges |= fan(1, branch=branch, depth=depth, id_generator=sampler)
+
+    G.add_edges_from(edges)
+
+    assert not nx.is_weakly_connected(G)
+
+    an = digraph_to_alchemical_network(G)
+    return an
+
+
+def fan(node, branch=3, depth=3, id_generator=None):
+    """Recursive edge generator."""
+
+    id_generator = id_generator or int_sampler(sampler_start=node + 1)
+
+    if depth == 0:
+        return set()
+
+    edges = {(node, next(id_generator)) for _ in range(branch)}
+
+    for _, next_node in edges.copy():
+        edges |= fan(next_node, depth=depth - 1, id_generator=id_generator)
+
+    return edges
