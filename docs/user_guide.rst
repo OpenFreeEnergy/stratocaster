@@ -11,7 +11,7 @@ As results are accumulated, the strategy must eventually reach a terminating con
 Additionally, valid strategies are deterministic, i.e. networks with a fixed set of previous results always return the same weights.
 While the details of selecting and running a transformation from the weights is out of scope for ``stratocaster``, the following code demonstrates where a strategy might fit in an iterative execution workflow.
 
-.. literalinclude:: iterative.py
+.. literalinclude:: ./code/iterative.py
 
 A ``None`` weight for a transformation means the transformation should not be performed again as more results are added.
 This differs from a zero weight, which could mean the transformation will eventually be proposed again with more results.
@@ -30,7 +30,7 @@ In the below example, we include only a ``max_runs`` setting, which is usually e
 
 The new ``Strategy`` implementation involves three main steps: 1) linking the strategy to its settings class, 2) defining the ``_default_settings`` class method, and 3) defining the ``_propose`` method.
 
-.. literalinclude:: newstrat.py
+.. literalinclude:: ./code/newstrat.py
 
 A definition of ``_settings_cls`` provides a guardrail by preventing a user of your strategy from supplying an unexpected settings type.
 Defining ``_default_settings`` allows a user to get the default settings through ``MyCustomStrategy.default_settings()``.
