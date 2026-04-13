@@ -8,7 +8,6 @@ It removes the burden for an individual or execution engine to determine which t
 For instance, transformations with many previously calculated repeats might have a lower priority compared to transformations that haven't been performed at all.
 This prioritization is encoded by transformation weights, which are presented for an ``AlchemicalNetwork`` given a set of previously computed results.
 As results are accumulated, the strategy must eventually reach a terminating condition where no weights are presented.
-
 Valid strategies are deterministic, i.e. networks with a fixed set of previous results always return the same weights.
 While the details of selecting and running a transformation from the weights is out of scope for ``stratocaster``, the following code demonstrates where a strategy might fit in an iterative execution workflow.
 
