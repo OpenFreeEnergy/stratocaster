@@ -5,7 +5,7 @@ from gufe.tokenization import GufeKey
 from pydantic import Field, field_validator
 
 from stratocaster.base import Strategy, StrategyResult
-from stratocaster.base models import StrategySettings
+from stratocaster.base.models import StrategySettings
 
 
 class MyCustomStrategySettings(StrategySettings):

@@ -40,6 +40,7 @@ This returns a ``StrategyResult`` object, which is a mapping between the transfo
 ``None`` weights are a terminating case: a transformation with a ``None`` weight won't be proposed again and a ``StrategyResult`` with only ``None`` weights is "complete".
 
 Calls to ``propose`` are deterministic and guaranteed to reach a terminating condition if the resulting weights are used to update the ``ProtocolResult`` objects in ``previous_results``.
+See the :ref:`user guide<user-guide-label>` for an example of this process.
 
 Other resources
 ~~~~~~~~~~~~~~~

@@ -1,3 +1,5 @@
+.. _user-guide-label:
+
 User Guide
 ==========
 
