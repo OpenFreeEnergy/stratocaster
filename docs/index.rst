@@ -3,7 +3,7 @@
    :alt: stratocaster logo
 
 #######################################################################
-alchemical effort allocation, automated
+Automated Alchemical Effort Allocation
 #######################################################################
 
 **stratocaster** is a ``Strategy`` library built on top of `gufe <https://gufe.openfree.energy/>`_ for the `Open Free Energy`_ ecosystem: given an ``AlchemicalNetwork`` and any existing results for its ``Transformation``\s, a ``Strategy`` proposes where to apply additional computational effort to produce result data in an "optimal" way.

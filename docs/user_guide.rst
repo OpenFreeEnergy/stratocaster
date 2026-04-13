@@ -1,4 +1,4 @@
-User guide
+User Guide
 ==========
 
 A ``Strategy`` is an algorithm that assists in traversing the execution path of transformations within ``gufe`` ``AlchemicalNetwork`` objects.
