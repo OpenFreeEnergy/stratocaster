@@ -3,12 +3,19 @@
    :alt: stratocaster logo
 
 #######################################################################
-AlchemicalNetwork Transformation Prioritization Library
+Automated Alchemical Effort Allocation
 #######################################################################
 
-The stratocaster library is complementary to `gufe <https://gufe.openfree.energy/>`_ and provides suggestions, via Strategies, for optimally executing Transformation Protocols defined in AlchemicalNetworks.
+**stratocaster** is a ``Strategy`` library built on top of `gufe <https://gufe.openfree.energy/>`_ for the `Open Free Energy`_ ecosystem: given an ``AlchemicalNetwork`` and any existing results for its ``Transformation``\s, a ``Strategy`` proposes where to apply additional computational effort to produce result data in an "optimal" way.
+Different ``Strategy`` implementations define "optimal" differently, with the choice of ``Strategy`` determined by the application.
 
-This library includes a set of Strategy implementations as well as base classes to facilitate the creation of custom Strategy implementations.
+**stratocaster** includes many such ``Strategy`` implementations, as well as base classes and guidance for creating new ones.
+A ``Strategy`` can be used directly on its own, or in combination with an automated execution system such as `alchemiscale`_ or `exorcist`_.
+**stratocaster** is fully open source under the **MIT license**.
+
+.. _Open Free Energy: https://openfree.energy/
+.. _alchemiscale: https://alchemiscale.org/
+.. _exorcist: https://github.com/OpenFreeEnergy/exorcist
 
 .. toctree::
    :maxdepth: 2
