@@ -45,7 +45,7 @@ class StrategyTestMixin:
         def random_runs():
             """Generate random inputs for propose."""
             return {
-                transformation.key: DummyProtocolResult(
+                transformation: DummyProtocolResult(
                     n_protocol_dag_results=randint(0, 3),
                     info=f"key: {transformation.key}",
                 )
@@ -85,11 +85,11 @@ class StrategyTestMixin:
 
         def counts_to_result_data(counts_dict):
             result_data = {}
-            for transformation_key, count in counts_dict.items():
+            for transformation, count in counts_dict.items():
                 result = DummyProtocolResult(
-                    n_protocol_dag_results=count, info=f"key: {transformation_key}"
+                    n_protocol_dag_results=count, info=f"key: {transformation.key}"
                 )
-                result_data[transformation_key] = result
+                result_data[transformation] = result
             return result_data
 
         def shuffle_take_n(keys_list, n):
@@ -98,7 +98,7 @@ class StrategyTestMixin:
 
         # initial transforms
         transformation_counts = {
-            transformation.key: 0 for transformation in fanning_network.edges
+            transformation: 0 for transformation in fanning_network.edges
         }
 
         max_iterations = 100
@@ -114,19 +114,19 @@ class StrategyTestMixin:
             proposal = strategy.propose(fanning_network, result_data)
 
             # get random transformations from those with a non-None weight
-            resolved_keys = shuffle_take_n(
+            resolved_transformations = shuffle_take_n(
                 [
-                    key
-                    for key, weight in proposal.resolve().items()
+                    transformation
+                    for transformation, weight in proposal.resolve().items()
                     if weight is not None
                 ],
                 5,
             )
 
-            if resolved_keys:
+            if resolved_transformations:
                 # pretend we ran each of the randomly selected protocols
-                for key in resolved_keys:
-                    transformation_counts[key] += 1
+                for transformation in resolved_transformations:
+                    transformation_counts[transformation] += 1
             # if we got an empty list back, there are not more protocols to run
             else:
                 break

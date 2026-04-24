@@ -4,6 +4,7 @@ from random import randint, shuffle
 import pytest
 from gufe import AlchemicalNetwork
 from gufe.tests.test_protocol import DummyProtocol, DummyProtocolResult
+from gufe.transformations import Transformation, NonTransformation
 
 from stratocaster.base.models import StrategySettings
 from stratocaster.base.strategy import StrategyResult
@@ -13,8 +14,6 @@ from stratocaster.strategies.connectivity import (
 )
 
 from stratocaster.tests.utils import StrategyTestMixin
-
-from gufe.tokenization import GufeKey
 
 
 class TestConnectivityStrategy(StrategyTestMixin):
@@ -47,13 +46,12 @@ class TestConnectivityStrategy(StrategyTestMixin):
             math.log(settings.cutoff / 3.5) / math.log(settings.decay_rate)
         )
 
-        result_data: dict[GufeKey, DummyProtocolResult] = {}
+        result_data: dict[Transformation | NonTransformation, DummyProtocolResult] = {}
         for transformation in benzene_variants_star_map.edges:
-            transformation_key = transformation.key
             result = DummyProtocolResult(
-                n_protocol_dag_results=num_runs + 1, info=f"key: {transformation_key}"
+                n_protocol_dag_results=num_runs + 1, info=f"key: {transformation.key}"
             )
-            result_data[transformation_key] = result
+            result_data[transformation] = result
 
         results = strategy.propose(benzene_variants_star_map, result_data)
 
@@ -66,13 +64,12 @@ class TestConnectivityStrategy(StrategyTestMixin):
         max_runs = self.default_strategy.settings.max_runs
         assert isinstance(max_runs, int)
 
-        result_data: dict[GufeKey, DummyProtocolResult] = {}
+        result_data: dict[Transformation | NonTransformation, DummyProtocolResult] = {}
         for transformation in benzene_variants_star_map.edges:
-            transformation_key = transformation.key
             result = DummyProtocolResult(
-                n_protocol_dag_results=max_runs, info=f"key: {transformation_key}"
+                n_protocol_dag_results=max_runs, info=f"key: {transformation.key}"
             )
-            result_data[transformation_key] = result
+            result_data[transformation] = result
 
         results = self.default_strategy.propose(benzene_variants_star_map, result_data)
 
@@ -85,13 +82,12 @@ class TestConnectivityStrategy(StrategyTestMixin):
         self, benzene_variants_star_map: AlchemicalNetwork
     ):
 
-        result_data: dict[GufeKey, DummyProtocolResult] = {}
+        result_data: dict[Transformation | NonTransformation, DummyProtocolResult] = {}
         for transformation in benzene_variants_star_map.edges:
-            transformation_key = transformation.key
             result = DummyProtocolResult(
-                n_protocol_dag_results=2, info=f"key: {transformation_key}"
+                n_protocol_dag_results=2, info=f"key: {transformation.key}"
             )
-            result_data[transformation_key] = result
+            result_data[transformation] = result
 
         results = self.default_strategy.propose(benzene_variants_star_map, result_data)
         results_no_data = self.default_strategy.propose(benzene_variants_star_map, {})
@@ -107,7 +103,7 @@ class TestConnectivityStrategy(StrategyTestMixin):
             benzene_variants_star_map, {}
         )
 
-        assert all([weight == 3.5 for weight in proposal._weights.values()])
+        assert all([weight == 3.5 for _, weight in proposal._weights])
         assert 1 == sum(
             weight for weight in proposal.resolve().values() if weight is not None
         )

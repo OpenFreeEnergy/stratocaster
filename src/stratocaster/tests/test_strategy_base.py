@@ -1,18 +1,34 @@
-from gufe import AlchemicalNetwork, ProtocolResult
-from gufe.tokenization import GufeKey
+import pytest
 
-from stratocaster.base import Strategy, StrategyResult, StrategySettings
+from gufe import AlchemicalNetwork, ProtocolResult
+from gufe.transformations import Transformation, NonTransformation
+
+from stratocaster.base import (
+    Strategy,
+    StrategyResult,
+    StrategyResultValidationError,
+    StrategySettings,
+)
+
+
+class DummyTransformation(Transformation):
+    pass
+
+
+class DummyNonTransformation(NonTransformation):
+    pass
 
 
 class TestStrategyResult:
 
     result = StrategyResult(
         {
-            GufeKey("MyTransformation-ABC123"): 1,
-            GufeKey("MyTransformation-321CBA"): None,
-            GufeKey("MyOtherTransformation-789xyz"): 10,
+            DummyTransformation(stateA=0, stateB=1, protocol=None): 1,
+            DummyTransformation(stateA=1, stateB=2, protocol=None): None,
+            DummyNonTransformation(system=2, protocol=None): 10,
         }
     )
+    assert 3 == len(result.weights)
 
     def test_dict_roundtrip(self):
         assert StrategyResult.from_dict(self.result.to_dict()) == self.result
@@ -27,6 +43,29 @@ class TestStrategyResult:
         """Resolve produces normalized weights for all non-None values."""
         res = self.result.resolve()
         assert 1 == sum([value for _, value in res.items() if value is not None])
+
+    def test_validation(self):
+
+        # negative weight should not pass validation
+        with pytest.raises(StrategyResultValidationError):
+            result = StrategyResult(
+                {
+                    DummyTransformation(stateA=0, stateB=1, protocol=None): -1,
+                    DummyTransformation(stateA=1, stateB=2, protocol=None): None,
+                    DummyNonTransformation(system=2, protocol=None): 10,
+                }
+            )
+
+        # Keys must be either Transformation or NonTransformation,
+        # provide old style keys for test
+        with pytest.raises(StrategyResultValidationError):
+            result = StrategyResult(
+                {
+                    DummyTransformation(stateA=0, stateB=1, protocol=None).key: 1,
+                    DummyTransformation(stateA=1, stateB=2, protocol=None).key: None,
+                    DummyNonTransformation(system=2, protocol=None).key: 10,
+                }
+            )
 
 
 class DummyStrategySettings(StrategySettings):
@@ -44,7 +83,7 @@ class DummyStrategy(Strategy):
     def _propose(
         self,
         alchemical_network: AlchemicalNetwork,
-        protocol_results: dict[GufeKey, ProtocolResult],
+        protocol_results: dict[Transformation | NonTransformation, ProtocolResult],
     ):
         assert alchemical_network, protocol_results
         return StrategyResult({})

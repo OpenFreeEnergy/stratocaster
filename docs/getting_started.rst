@@ -31,7 +31,7 @@ You can calculate transformation weights for an :external+gufe:py:class:`~gufe.n
    settings = ConnectivityStrategy.default_settings()
    strategy = ConnectivityStrategy(settings)
 
-   previous_results: dict[GufeKey, ProtocolResult] = {}
+   previous_results: dict[Transformation | NonTransformation, ProtocolResult] = {}
 
    strategy_result: StrategyResult = strategy.propose(alchem_network, previous_results)
 

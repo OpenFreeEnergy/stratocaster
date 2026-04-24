@@ -1,6 +1,6 @@
 import pytest
 from gufe import AlchemicalNetwork, ProtocolResult
-from gufe.tokenization import GufeKey
+from gufe.transformations import Transformation, NonTransformation
 
 from stratocaster.base import Strategy, StrategySettings
 from stratocaster.base.strategy import StrategyResult
@@ -23,7 +23,7 @@ class StrategyNoSettings(Strategy):
     def _propose(
         self,
         alchemical_network: AlchemicalNetwork,
-        protocol_results: dict[GufeKey, ProtocolResult],
+        protocol_results: dict[Transformation | NonTransformation, ProtocolResult],
     ) -> StrategyResult:
         return StrategyResult({})
 

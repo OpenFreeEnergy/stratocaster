@@ -1,7 +1,7 @@
 import networkx as nx
 
 from gufe import AlchemicalNetwork, ProtocolResult
-from gufe.tokenization import GufeKey
+from gufe.transformations import Transformation, NonTransformation
 
 from pydantic import (
     Field,
@@ -103,7 +103,7 @@ class RadialGrowthStrategy(Strategy):
     def _propose(
         self,
         alchemical_network: AlchemicalNetwork,
-        protocol_results: dict[GufeKey, ProtocolResult],
+        protocol_results: dict[Transformation | NonTransformation, ProtocolResult],
     ) -> StrategyResult:
         """Propose `Transformation` weight recommendations based on
         `Transformation` distance from the graph center.
@@ -112,8 +112,9 @@ class RadialGrowthStrategy(Strategy):
         ----------
         alchemical_network
         protocol_results
-            A dictionary whose keys are the `GufeKey`s of `Transformation`s in the `AlchemicalNetwork`
-            and whose values are the `ProtocolResult`s for those `Transformation`s.
+            A dictionary whose keys are the `Transformation`s (or `NonTransformation`s)
+            in the `AlchemicalNetwork` and whose values are the `ProtocolResult`s for
+            those `Transformation`s.
 
         Returns
         -------
@@ -123,7 +124,7 @@ class RadialGrowthStrategy(Strategy):
         """
 
         alchemical_network_mdg = alchemical_network.graph
-        weights: dict[GufeKey, float | None] = {}
+        weights: dict[Transformation | NonTransformation, float | None] = {}
 
         # calculate all node eccentricies
         e = nx.eccentricity(alchemical_network_mdg.to_undirected())
@@ -142,12 +143,12 @@ class RadialGrowthStrategy(Strategy):
             # find the range of eccentricies
             lower, upper = min(edge), max(edge)
 
-            transformation_key = alchemical_network_mdg.get_edge_data(state_a, state_b)[
-                0
-            ]["object"].key
+            transformation = alchemical_network_mdg.get_edge_data(state_a, state_b)[0][
+                "object"
+            ]
 
             factor_repeats = 1
-            match (protocol_results.get(transformation_key)):
+            match (protocol_results.get(transformation)):
                 case None:
                     transformation_n_protcol_dag_results = 0
                     # since we have no results for this
@@ -167,17 +168,17 @@ class RadialGrowthStrategy(Strategy):
 
             # stop condition given max runs
             if self.settings.max_runs <= transformation_n_protcol_dag_results:
-                weights[transformation_key] = None
+                weights[transformation] = None
                 continue
 
             # save the upper eccentricity for later when we know the
             # lowest_completed. This is the transformation's effective
             # distance from the center
-            transformation_eccentricity[transformation_key] = upper
-            weights[transformation_key] = factor_repeats
+            transformation_eccentricity[transformation] = upper
+            weights[transformation] = factor_repeats
 
         # start applying weights due to effective distance
-        for transformation_key, e in transformation_eccentricity.items():
+        for transformation, e in transformation_eccentricity.items():
             distance = e - lowest_complete_eccentricity
 
             if distance <= self.settings.candidacy_max_distance:
@@ -195,6 +196,6 @@ class RadialGrowthStrategy(Strategy):
                 # set to zero, not None
                 distance_factor = 0
 
-            weights[transformation_key] *= distance_factor
+            weights[transformation] *= distance_factor
 
         return StrategyResult(weights)

@@ -1,0 +1,2 @@
+class StrategyResultValidationError(Exception):
+    pass

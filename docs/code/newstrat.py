@@ -1,5 +1,5 @@
 from gufe import AlchemicalNetwork, ProtocolResult
-from gufe.tokenization import GufeKey
+from gufe.transformations import Transformation, NonTransformation
 
 # if including validators with settings, recommended
 from pydantic import Field, field_validator
@@ -38,6 +38,6 @@ class MyCustomStrategy(Strategy):
     def _propose(
         self,
         alchem_network: AlchemicalNetwork,
-        protocol_results: dict[GufeKey, ProtocolResult]
+        protocol_results: dict[Transformation | NonTransformation, ProtocolResult]
     ) -> StrategyResult:
         ...
