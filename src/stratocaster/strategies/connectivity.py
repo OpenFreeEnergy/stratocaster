@@ -1,5 +1,5 @@
 from gufe import AlchemicalNetwork, ProtocolResult
-from gufe.tokenization import GufeKey
+from gufe.transformations import Transformation, NonTransformation
 
 from stratocaster.base import Strategy, StrategyResult
 from stratocaster.base.models import StrategySettings
@@ -90,15 +90,15 @@ class ConnectivityStrategy(Strategy):
     def _propose(
         self,
         alchemical_network: AlchemicalNetwork,
-        protocol_results: dict[GufeKey, ProtocolResult],
+        protocol_results: dict[Transformation | NonTransformation, ProtocolResult],
     ) -> StrategyResult:
         """Propose `Transformation` weight recommendations based on high connectivity nodes.
 
         Parameters
         ----------
         alchemical_network: AlchemicalNetwork
-        protocol_results: dict[GufeKey, ProtocolResult]
-            A dictionary whose keys are the `GufeKey`s of `Transformation`s in the `AlchemicalNetwork`
+        protocol_results: dict[Transformation | NonTransformation, ProtocolResult]
+            A dictionary whose keys are the `Transformation`s of an `AlchemicalNetwork`
             and whose values are the `ProtocolResult`s for those `Transformation`s.
 
         Returns
@@ -113,7 +113,7 @@ class ConnectivityStrategy(Strategy):
         assert isinstance(settings, ConnectivityStrategySettings)
 
         alchemical_network_mdg = alchemical_network.graph
-        weights: dict[GufeKey, float | None] = {}
+        weights: dict[Transformation | NonTransformation, float | None] = {}
 
         for state_a, state_b in alchemical_network_mdg.edges():
             num_neighbors_a = alchemical_network_mdg.degree(state_a)
@@ -122,11 +122,11 @@ class ConnectivityStrategy(Strategy):
             # linter-satisfying assertion
             assert isinstance(num_neighbors_a, int) and isinstance(num_neighbors_b, int)
 
-            transformation_key = alchemical_network_mdg.get_edge_data(state_a, state_b)[
-                0
-            ]["object"].key
+            transformation = alchemical_network_mdg.get_edge_data(state_a, state_b)[0][
+                "object"
+            ]
 
-            match (protocol_results.get(transformation_key)):
+            match (protocol_results.get(transformation)):
                 case None:
                     transformation_n_protcol_dag_results = 0
                 case pr:
@@ -152,7 +152,7 @@ class ConnectivityStrategy(Strategy):
                     ):
                         weight = None
 
-            weights[transformation_key] = weight
+            weights[transformation] = weight
 
         results = StrategyResult(weights=weights)
         return results
