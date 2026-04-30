@@ -33,9 +33,21 @@ class StrategyResult(GufeTokenizable):
 
     def resolve(self) -> dict[GufeKey, float | None]:
         """Get normalized proposal weights relative to all non-None Transformation weights."""
-        weight_sum = sum(
-            [weight for weight in self._weights.values() if weight is not None]
-        )
+        non_none_weights = [
+            weight for weight in self._weights.values() if weight is not None
+        ]
+
+        if not non_none_weights:
+            return self.weights
+
+        weight_sum = sum(non_none_weights)
+        if weight_sum == 0:
+            raise ValueError(
+                "Cannot resolve weights: sum of non-None weights is zero. "
+                "This is likely a bug in the Strategy implementation. "
+                "Please raise an issue at https://github.com/OpenFreeEnergy/stratocaster/issues"
+            )
+
         normalized_weights = {
             key: weight / weight_sum if weight is not None else None
             for key, weight in self._weights.items()
