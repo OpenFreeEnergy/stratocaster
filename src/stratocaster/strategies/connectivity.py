@@ -10,8 +10,6 @@ from pydantic import (
     field_validator,
 )
 
-import pydantic
-
 
 class ConnectivityStrategySettings(StrategySettings):
     """Specific settings required for the ConnectivityStrategy."""
