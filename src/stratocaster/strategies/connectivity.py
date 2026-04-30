@@ -25,7 +25,7 @@ class ConnectivityStrategySettings(StrategySettings):
     )
     max_runs: int | None = Field(
         default=None,
-        description="the upper limit of protocol DAG results needed before a transformation is no longer weighed",
+        description="the upper limit of protocol DAG results needed before a transformation is no longer weighted",
     )
 
     @field_validator("cutoff", mode="before")
@@ -63,8 +63,9 @@ class ConnectivityStrategy(Strategy):
     """A Strategy that suggests Transformations which lead to nodes
     with higher degrees of connectivity.
 
-    The Transformation for a given Transformation is calculated as the
-    average number of connections both of its end states has.
+    The weight for a given Transformation is calculated as the average
+    number of connections both of its end states has.
+
     """
 
     _settings_cls = ConnectivityStrategySettings
@@ -128,13 +129,13 @@ class ConnectivityStrategy(Strategy):
 
             match (protocol_results.get(transformation_key)):
                 case None:
-                    transformation_n_protcol_dag_results = 0
+                    transformation_n_protocol_dag_results = 0
                 case pr:
                     assert isinstance(pr, ProtocolResult)
-                    transformation_n_protcol_dag_results = pr.n_protocol_dag_results
+                    transformation_n_protocol_dag_results = pr.n_protocol_dag_results
 
             scaling_factor = self._exponential_decay_scaling(
-                transformation_n_protcol_dag_results, settings.decay_rate
+                transformation_n_protocol_dag_results, settings.decay_rate
             )
             weight = scaling_factor * (num_neighbors_a + num_neighbors_b) / 2
 
@@ -143,12 +144,12 @@ class ConnectivityStrategy(Strategy):
                     if weight < cutoff:
                         weight = None
                 case (max_runs, None) if max_runs is not None:
-                    if transformation_n_protcol_dag_results >= max_runs:
+                    if transformation_n_protocol_dag_results >= max_runs:
                         weight = None
                 case (max_runs, cutoff) if max_runs is not None and cutoff is not None:
                     if (
                         weight < cutoff
-                        or transformation_n_protcol_dag_results >= max_runs
+                        or transformation_n_protocol_dag_results >= max_runs
                     ):
                         weight = None
 
