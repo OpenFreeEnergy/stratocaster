@@ -9,9 +9,38 @@ Find the documentation for stratocaster on [Read the Docs](https://stratocaster.
 
 ## Installation
 
+Install stratocaster via conda-forge:
+
+```bash
+conda install -c conda-forge stratocaster
+```
+
+Or install the latest development version via pip:
+
+```bash
+pip install git+https://github.com/OpenFreeEnergy/stratocaster.git@main
+```
+
 ## Usage
 
+Import a strategy and call `propose()` with your `AlchemicalNetwork` and existing results:
+
+```python
+from stratocaster.strategies import RadialGrowthStrategy
+
+strategy = RadialGrowthStrategy(RadialGrowthStrategy.default_settings())
+
+previous_results = {}
+result = strategy.propose(alchemical_network, previous_results)
+normalized_weights = result.resolve()
+```
+
+For more details, visit the [stratocaster documentation](https://stratocaster.readthedocs.io/en/latest/).
+
 ## Contributing
+
+Please report bugs or request features via the [issue tracker](https://github.com/OpenFreeEnergy/stratocaster/issues).
+Pull requests are encouraged for bug fixes, new strategies, and documentation improvements.
 
 ## License
 

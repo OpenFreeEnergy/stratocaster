@@ -17,7 +17,7 @@ class RadialGrowthStrategySettings(StrategySettings):
 
     max_runs: int = Field(
         default=3,
-        description="the upper limit of ProtocolDAG results needed before a Transformation is no longer weighed",
+        description="the upper limit of ProtocolDAG results needed before a Transformation is no longer weighted",
     )
 
     candidacy_max_distance: int = Field(
@@ -42,10 +42,10 @@ class RadialGrowthStrategySettings(StrategySettings):
         return value
 
     @field_validator("candidacy_max_distance", mode="before")
-    def validate_candidate_max_distance(cls, value):
+    def validate_candidacy_max_distance(cls, value):
         if not value >= 1:
             raise ValueError(
-                "`candidtate_max_distance` must be greater than or equal to 1"
+                "`candidacy_max_distance` must be greater than or equal to 1"
             )
         return value
 
@@ -68,7 +68,7 @@ class RadialGrowthStrategy(Strategy):
 
     The weight assigned to each Transformation depends on its highest
     ChemicalSystem distance, as measured and labeled by the vertex
-    eccentricty, from the lowest completed tier of distances. In the
+    eccentricity, from the lowest completed tier of distances. In the
     graph below, if at least one ``ProtocolDAGResult`` exists for both
     edges in 3-2-3, the lowest completed distance is 3. If neither
     edge or only one edge has a result, the lowest completed distance
@@ -125,13 +125,13 @@ class RadialGrowthStrategy(Strategy):
         alchemical_network_mdg = alchemical_network.graph
         weights: dict[GufeKey, float | None] = {}
 
-        # calculate all node eccentricies
+        # calculate all node eccentricities
         e = nx.eccentricity(alchemical_network_mdg.to_undirected())
 
         # start with the maximum value, this will be decremented as we
         # see evidence the value should be lower
         lowest_complete_eccentricity = max(e.values())
-        # hold on to the eccentricies of the transformations instead
+        # hold on to the eccentricities of the transformations instead
         # of the distances since we don't know the lowest complete
         # eccentricity until we process the full graph, distances can
         # be calculated after
@@ -139,7 +139,7 @@ class RadialGrowthStrategy(Strategy):
 
         for state_a, state_b in alchemical_network_mdg.edges():
             edge = e[state_a], e[state_b]
-            # find the range of eccentricies
+            # find the range of eccentricities
             lower, upper = min(edge), max(edge)
 
             transformation_key = alchemical_network_mdg.get_edge_data(state_a, state_b)[
@@ -149,7 +149,7 @@ class RadialGrowthStrategy(Strategy):
             factor_repeats = 1
             match (protocol_results.get(transformation_key)):
                 case None:
-                    transformation_n_protcol_dag_results = 0
+                    transformation_n_protocol_dag_results = 0
                     # since we have no results for this
                     # transformation, we know the lowest complete
                     # eccentricity must be lower than the upper
@@ -157,16 +157,16 @@ class RadialGrowthStrategy(Strategy):
                     if upper < lowest_complete_eccentricity:
                         lowest_complete_eccentricity = lower
                 case pr:
-                    transformation_n_protcol_dag_results = pr.n_protocol_dag_results
+                    transformation_n_protocol_dag_results = pr.n_protocol_dag_results
                     # scale the repeat factor to discourage reruns as
                     # specified by the user's decay_repeat_rate
                     factor_repeats *= (
                         self.settings.decay_repeat_rate
-                        ** transformation_n_protcol_dag_results
+                        ** transformation_n_protocol_dag_results
                     )
 
             # stop condition given max runs
-            if self.settings.max_runs <= transformation_n_protcol_dag_results:
+            if self.settings.max_runs <= transformation_n_protocol_dag_results:
                 weights[transformation_key] = None
                 continue
 

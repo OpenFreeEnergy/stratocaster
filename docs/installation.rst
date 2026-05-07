@@ -3,7 +3,7 @@
 Installation
 ============
 
-The only requirement for installing statocaster is a working installation of gufe with a version 1.2.0 or higher.
+The only requirement for installing stratocaster is a working installation of gufe with a version 1.2.0 or higher.
 For general use, we recommend installing from the conda-forge channel, which will also install gufe in the process.
 
 conda-forge channel
@@ -13,7 +13,7 @@ If you use conda, stratocaster can be installed through the conda-forge channel.
 
 .. code::
 
-   conda create -n statocaster-env
+   conda create -n stratocaster-env
    conda activate stratocaster-env
    conda install -c conda-forge stratocaster
 

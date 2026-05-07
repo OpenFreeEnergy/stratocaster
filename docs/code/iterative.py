@@ -1,4 +1,3 @@
-import random
 from stratocaster.strategies import ConnectivityStrategy
 
 settings = ConnectivityStrategy.default_settings()
@@ -7,10 +6,10 @@ strategy = ConnectivityStrategy(settings)
 previous_results = {}
 # a loop that will eventually end
 while True:
-    strategy_result = strategy.propose()
+    strategy_result = strategy.propose(alchem_network, previous_results)
     normalized_weights = strategy_result.resolve()
     # check if there are any weights
-    if not any(weights.values()):
+    if not any(normalized_weights.values()):
         break
 
     # Pick a transformation from the weights, run it, update previous_results.

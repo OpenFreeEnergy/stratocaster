@@ -15,7 +15,7 @@ Verify the installation was successful in a Python interpreter
 
 .. code:: python
 
-   import statocaster
+   import stratocaster
    print(stratocaster.__version__)
 
 3. Quick-start example
