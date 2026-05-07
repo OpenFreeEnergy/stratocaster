@@ -1,3 +1,5 @@
+import pytest
+
 from gufe import AlchemicalNetwork, ProtocolResult
 from gufe.tokenization import GufeKey
 
@@ -27,6 +29,19 @@ class TestStrategyResult:
         """Resolve produces normalized weights for all non-None values."""
         res = self.result.resolve()
         assert 1 == sum([value for _, value in res.items() if value is not None])
+
+    def test_resolve_no_zero_division(self):
+        all_zero_weights = StrategyResult(
+            {key: 0 for key, _ in self.result.weights.items()}
+        )
+        all_none_weights = StrategyResult(
+            {key: None for key, _ in self.result.weights.items()}
+        )
+
+        with pytest.raises(ValueError):
+            _ = all_zero_weights.resolve()
+
+        _ = all_none_weights.resolve()
 
 
 class DummyStrategySettings(StrategySettings):
